@@ -7,4 +7,17 @@ services:
       - ./backend:/app
     tty: true
 
-  
+  front:
+    container_name: front
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    tty: true
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend:/app
+      - node_modules:/app/node_modules
+
+volumes:
+  node_modules: {}
