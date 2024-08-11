@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -14,10 +15,14 @@ type User struct {
 }
 
 func main() {
+	password := os.Getenv("POSTGRES_PASSWORD")
+	username := os.Getenv("POSTGRES_USER")
+	dbname := os.Getenv("POSTGRES_DB")
+	hostname := os.Getenv("HOST_NAME")
 
-	fmt.Println("hello world")
+	dataSource := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", hostname, username, password, dbname)
 
-	db, err := sqlx.Connect("postgres", "host=db user=user password=example dbname=test sslmode=disable")
+	db, err := sqlx.Connect("postgres", dataSource)
 	if err != nil {
 		log.Fatalln(err)
 	}
