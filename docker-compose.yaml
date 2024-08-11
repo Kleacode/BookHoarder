@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   back:
+    container_name: bookhoarder-back
     build: ./backend
     volumes:
       - ./backend:/app
@@ -28,6 +29,7 @@ services:
       - node_modules:/app/node_modules
 
   db:
+    container_name: bookhoarder-db
     build: ./db
     restart: always
     
