@@ -1,57 +1,60 @@
 name: frontend ci
 on:
-    pull_request:
-        types: [opened, reopened, synchronize, ready_for_review]
+  pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
+
+env:
+  WORKING_DIRECTORY: frontend
 
 jobs:
-    front-lint:
-        runs-on: ubuntu-24.04
-        if: ${{ !(!contains(github.head_ref, 'frontend')) && !endsWith(github.head_ref, 'back-only') && !endsWith(github.head_ref, 'no-code') }}
-        defaults:
-          run:
-            working-directory: ${{ env.WORKING_DIRECTORY }}
-        steps:
-        - uses: actions/checkout@v4
-        - name: Set pnpm version to GITHUB_ENV
-          run: |
-            pnpm_version=$(cat package.json | jq -r '.volta.pnpm')
-            node_version=$(cat package.json | jq -r '.volta.node')
-            echo "PNPM_VERSION=${pnpm_version}" >> $GITHUB_ENV
-            echo "NODE_VERSION=${node_version}" >> $GITHUB_ENV
-        - uses: pnpm/action-setup@v2
-          with:
-            version: ${{ env.PNPM_VERSION }}
-        - name: Set up Node.js
-          uses: actions/setup-node@v3
-          with:
-            node-version: ${{ env.NODE_VERSION }}
-            cache: "pnpm"
-        - name: Install dependencies
-          run: pnpm i --frozen-lockfile
-        - run: pnpm run lint
-    front-test:
-        runs-on: ubuntu-24.04
-        if: ${{ !(!contains(github.head_ref, 'frontend')) && !endsWith(github.head_ref, 'back-only') && !endsWith(github.head_ref, 'no-code') }}
-        defaults:
-          run:
-            working-directory: ${{ env.WORKING_DIRECTORY }}
-        steps:
-        - uses: actions/checkout@v4
-        - name: Set pnpm version to GITHUB_ENV
-          run: |
-            pnpm_version=$(cat package.json | jq -r '.volta.pnpm')
-            node_version=$(cat package.json | jq -r '.volta.node')
-            echo "PNPM_VERSION=${pnpm_version}" >> $GITHUB_ENV
-            echo "NODE_VERSION=${node_version}" >> $GITHUB_ENV
-        - uses: pnpm/action-setup@v2
-          with:
-            version: ${{ env.PNPM_VERSION }}
-        - name: Set up Node.js
-          uses: actions/setup-node@v3
-          with:
-            node-version: ${{ env.NODE_VERSION }}
-            cache: "pnpm"
-        - name: Install dependencies
-          run: pnpm i --frozen-lockfile
-        - run: pnpm test
+  front-lint:
+      runs-on: ubuntu-24.04
+      if: ${{ !(!contains(github.head_ref, 'frontend')) && !endsWith(github.head_ref, 'back-only') && !endsWith(github.head_ref, 'no-code') }}
+      defaults:
+        run:
+          working-directory: ${{ env.WORKING_DIRECTORY }}
+      steps:
+      - uses: actions/checkout@v4
+      - name: Set pnpm version to GITHUB_ENV
+        run: |
+          pnpm_version=$(cat package.json | jq -r '.volta.pnpm')
+          node_version=$(cat package.json | jq -r '.volta.node')
+          echo "PNPM_VERSION=${pnpm_version}" >> $GITHUB_ENV
+          echo "NODE_VERSION=${node_version}" >> $GITHUB_ENV
+      - uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+      - run: pnpm run lint
+  front-test:
+      runs-on: ubuntu-24.04
+      if: ${{ !(!contains(github.head_ref, 'frontend')) && !endsWith(github.head_ref, 'back-only') && !endsWith(github.head_ref, 'no-code') }}
+      defaults:
+        run:
+          working-directory: ${{ env.WORKING_DIRECTORY }}
+      steps:
+      - uses: actions/checkout@v4
+      - name: Set pnpm version to GITHUB_ENV
+        run: |
+          pnpm_version=$(cat package.json | jq -r '.volta.pnpm')
+          node_version=$(cat package.json | jq -r '.volta.node')
+          echo "PNPM_VERSION=${pnpm_version}" >> $GITHUB_ENV
+          echo "NODE_VERSION=${node_version}" >> $GITHUB_ENV
+      - uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm i --frozen-lockfile
+      - run: pnpm test
 
