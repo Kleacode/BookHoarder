@@ -19,10 +19,16 @@ jobs:
           run: |
             pnpm_version=$(cat package.json | jq -r '.volta.pnpm')
             echo "PV=${pnpm_version}" >> $GITHUB_ENV
-        - uses: pnpm/action-setup@v2.2.2
+        - uses: pnpm/action-setup@v2
           with:
             version: ${{ env.PV }}
-        - run: pnpm i --frozen-lockfile
+        - name: Set up Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version-file: package.json
+            cache: "pnpm"
+        - name: Install dependencies
+          run: pnpm i --frozen-lockfile
         - run: pnpm run lint
     front-test:
         runs-on: ubuntu-24.04
@@ -36,9 +42,15 @@ jobs:
           run: |
             pnpm_version=$(cat package.json | jq -r '.volta.pnpm')
             echo "PV=${pnpm_version}" >> $GITHUB_ENV
-        - uses: pnpm/action-setup@v2.2.2
+        - uses: pnpm/action-setup@v2
           with:
             version: ${{ env.PV }}
-        - run: pnpm i --frozen-lockfile
+        - name: Set up Node.js
+          uses: actions/setup-node@v3
+          with:
+            node-version-file: package.json
+            cache: "pnpm"
+        - name: Install dependencies
+          run: pnpm i --frozen-lockfile
         - run: pnpm test
 
