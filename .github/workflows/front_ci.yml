@@ -7,6 +7,9 @@ jobs:
     front-lint:
         runs-on: ubuntu-24.04
         if: ${{ !(!contains(github.head_ref, 'frontend')) && !endsWith(github.head_ref, 'back-only') && !endsWith(github.head_ref, 'no-code') }}
+        defaults:
+            run:
+              working-directory: ${{ env.WORKING_DIRECTORY }}
         steps:
         - uses: actions/checkout@v4
         - name: Set pnpm version to GITHUB_ENV
@@ -25,9 +28,7 @@ jobs:
             cache: "pnpm"
         - name: Install dependencies
           run: pnpm i --frozen-lockfile
-          working-directory: ./frontend
         - run: pnpm run lint
-          working-directory: ./frontend
     front-test:
         runs-on: ubuntu-24.04
         if: ${{ !(!contains(github.head_ref, 'frontend')) && !endsWith(github.head_ref, 'back-only') && !endsWith(github.head_ref, 'no-code') }}
@@ -52,7 +53,5 @@ jobs:
             cache: "pnpm"
         - name: Install dependencies
           run: pnpm i --frozen-lockfile
-          working-directory: ./frontend
         - run: pnpm test
-          working-directory: ./frontend
 
