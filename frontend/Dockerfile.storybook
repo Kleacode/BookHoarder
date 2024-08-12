@@ -7,7 +7,9 @@ RUN npm i -g pnpm
 
 RUN set -ex \
     && apt update \
-    && apt upgrade -y
+    && apt upgrade \
+    && apt install -y \
+    xdg-utils
 
 WORKDIR /app
 

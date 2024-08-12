@@ -11,9 +11,7 @@ services:
     ports:
       - 8080:8080
 
-
   front:
-    container_name: front
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -24,6 +22,18 @@ services:
       - ./frontend:/app
       - node_modules:/app/node_modules
 
+  storybook:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.storybook
+    tty: true
+    ports:
+      - 6006:6006
+    volumes:
+      - ./frontend:/app
+      - node_modules:/app/node_modules
+    command: pnpm storybook
+
   db:
     build: ./db
     restart: always
@@ -32,7 +42,7 @@ services:
       POSTGRES_PASSWORD: example
       POSTGRES_USER: user
       POSTGRES_DB: test
-        
+
     ports:
       - 5432:5432
 
