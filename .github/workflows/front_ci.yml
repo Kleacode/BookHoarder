@@ -29,6 +29,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
+          cache-dependency-path: '**/pnpm-lock.yaml'
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
       - run: pnpm run lint
@@ -54,6 +55,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
+          cache-dependency-path: '**/pnpm-lock.yaml'
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
       - run: pnpm test
