@@ -2,7 +2,10 @@ version: "3.8"
 
 services:
   back:
-    build: ./backend
+    container_name: bookhoarder-back
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
     volumes:
       - ./backend:/app
     tty: true
@@ -10,6 +13,24 @@ services:
       - db
     ports:
       - 8080:8080
+        
+    env_file:
+      - ./backend/.env
+
+  swagger:
+    container_name: bookhoarder-swagger
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.swagger
+    tty: true
+
+    environment:
+      - SWAGGER_JSON=/openapi/openapi.yaml
+    volumes:
+      - ./backend/openapi:/openapi
+      
+    ports:
+      - "8001:8080"
 
   front:
     build:
@@ -35,7 +56,10 @@ services:
     command: pnpm storybook
 
   db:
-    build: ./db
+    build: 
+      context: ./db
+      dockerfile: Dockerfile
+      
     restart: always
 
     environment:
