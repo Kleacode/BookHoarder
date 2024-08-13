@@ -16,7 +16,7 @@ get:
     in: query
     required: false
     schema: 
-      type: array,
+      type: array
       items: 
         type: string
   
