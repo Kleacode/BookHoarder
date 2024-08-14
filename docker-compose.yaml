@@ -2,6 +2,7 @@ version: "3.8"
 
 services:
   back:
+    container_name: bookhoarder-back
     build: ./backend
     volumes:
       - ./backend:/app
@@ -10,6 +11,9 @@ services:
       - db
     ports:
       - 8080:8080
+        
+    env_file:
+      - ./backend/.local.env
 
   front:
     build:
@@ -35,16 +39,15 @@ services:
     command: pnpm storybook
 
   db:
+    container_name: bookhoarder-db
     build: ./db
     restart: always
-
-    environment:
-      POSTGRES_PASSWORD: example
-      POSTGRES_USER: user
-      POSTGRES_DB: test
-
+    
     ports:
       - 5432:5432
+
+    env_file:
+      - ./db/.local.env
 
 volumes:
   node_modules: {}
