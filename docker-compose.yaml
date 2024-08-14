@@ -13,7 +13,7 @@ services:
       - 8080:8080
         
     env_file:
-      - ./backend/.env
+      - ./backend/.local.env
 
   front:
     build:
@@ -47,7 +47,7 @@ services:
       - 5432:5432
 
     env_file:
-      - ./db/.env
+      - ./db/.local.env
 
 volumes:
   node_modules: {}
