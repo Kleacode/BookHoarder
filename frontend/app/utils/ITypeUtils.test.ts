@@ -16,7 +16,7 @@ describe("isObject", () => {
 		expect(isObject({})).toBe(true);
 	});
 
-	it("ng", () =>{
+	it("ng", () => {
 		expect(isObject(1)).toBe(false);
 		expect(isObject(0)).toBe(false);
 		expect(isObject(true)).toBe(false);
@@ -25,5 +25,5 @@ describe("isObject", () => {
 		expect(isObject("")).toBe(false);
 		expect(isObject([])).toBe(false);
 		expect(isObject([1, "string"])).toBe(false);
-	})
+	});
 });
