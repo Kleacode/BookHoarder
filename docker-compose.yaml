@@ -8,6 +8,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend:/app
+      - ./openapi_schema:/openapi
     tty: true
     depends_on:
       - db
@@ -20,14 +21,14 @@ services:
   swagger:
     container_name: bookhoarder-swagger
     build: 
-      context: ./backend
+      context: ./openapi_schema
       dockerfile: Dockerfile.swagger
     tty: true
 
     environment:
       - SWAGGER_JSON=/openapi/openapi.yaml
     volumes:
-      - ./backend/openapi:/openapi
+      - ./openapi_schema:/openapi
       
     ports:
       - "8001:8080"
