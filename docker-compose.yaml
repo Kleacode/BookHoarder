@@ -15,9 +15,7 @@ services:
     env_file:
       - ./backend/.env
 
-
   front:
-    container_name: front
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -27,6 +25,18 @@ services:
     volumes:
       - ./frontend:/app
       - node_modules:/app/node_modules
+
+  storybook:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.storybook
+    tty: true
+    ports:
+      - 6006:6006
+    volumes:
+      - ./frontend:/app
+      - node_modules:/app/node_modules
+    command: pnpm storybook
 
   db:
     container_name: bookhoarder-db
