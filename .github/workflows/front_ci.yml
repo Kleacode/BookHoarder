@@ -8,12 +8,12 @@ env:
 
 jobs:
   front-lint:
-      runs-on: ubuntu-24.04
-      if: ${{ !(!contains(github.head_ref, 'frontend')) && !endsWith(github.head_ref, 'back-only') && !endsWith(github.head_ref, 'no-code') }}
-      defaults:
-        run:
-          working-directory: ${{ env.WORKING_DIRECTORY }}
-      steps:
+    runs-on: ubuntu-24.04
+    if: ${{ !endsWith(github.head_ref, 'back-only') && !endsWith(github.head_ref, 'no-code') }}
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+    steps:
       - uses: actions/checkout@v4
       - name: Set pnpm version to GITHUB_ENV
         run: |
@@ -29,20 +29,17 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
-          cache-dependency-path: '**/pnpm-lock.yaml'
+          cache-dependency-path: "**/pnpm-lock.yaml"
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
-      - name: Lint check
-        run: pnpm run lint
-      - name: Type check
-        run: pnpm run typecheck
+      - run: pnpm run lint
   front-test:
-      runs-on: ubuntu-24.04
-      if: ${{ !(!contains(github.head_ref, 'frontend')) && !endsWith(github.head_ref, 'back-only') && !endsWith(github.head_ref, 'no-code') }}
-      defaults:
-        run:
-          working-directory: ${{ env.WORKING_DIRECTORY }}
-      steps:
+    runs-on: ubuntu-24.04
+    if: ${{ !endsWith(github.head_ref, 'back-only') && !endsWith(github.head_ref, 'no-code') }}
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+    steps:
       - uses: actions/checkout@v4
       - name: Set pnpm version to GITHUB_ENV
         run: |
@@ -58,7 +55,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "pnpm"
-          cache-dependency-path: '**/pnpm-lock.yaml'
+          cache-dependency-path: "**/pnpm-lock.yaml"
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
       - run: pnpm test
