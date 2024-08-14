@@ -26,7 +26,11 @@ type Story = StoryObj<typeof meta>;
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Primary: Story = {
 	args: {
-		primary: true,
-		label: "Button",
+		active: "register",
+		links: [
+			{ id: "register", path: "", name: "本の登録" },
+			{ id: "check", path: "", name: "積読確認" },
+			{ id: "settings", path: "", name: "全体設定" },
+		],
 	},
 };
