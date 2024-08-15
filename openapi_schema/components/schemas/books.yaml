@@ -1,0 +1,17 @@
+book:
+  type: object
+  required:
+    - bookId
+    - title
+  properties:
+    bookId:
+      type: integer
+      format: int64
+    title:
+      type: string
+
+books:
+  type: array
+  maxItems: 50
+  items:
+    $ref: "#/book"

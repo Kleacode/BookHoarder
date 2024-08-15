@@ -1,0 +1,4 @@
+parser:
+  infer_types: true 
+  allow_remote: true
+  depth_limit: 1000 
