@@ -3,18 +3,19 @@ info:
   title: BookHoarder API
   description: description
   version: 0.0.1
+  
 servers:
   - url: http://localhost:8080
     description: dev server
-
-tags:
-- name: books
-  description: book management
   
 paths:
   /books:
     $ref: "./paths/books.yaml"
-  /books/user/{userId}:
-    $ref: "./paths/books_userId.yaml"
-  /books/book/{bookId}:
-    $ref: "./paths/books_bookId.yaml"
+  /books/{bookId}:
+    $ref: "./paths/books_bookId.yaml"    
+  /{userId}/books/{bookId}:
+    $ref: "./paths/userId_books_bookId.yaml"
+  /{userId}/hoarder:
+    $ref: "./paths/userId_hoarder.yaml" 
+  /{userId}/hoarder/{bookId}:
+    $ref: "./paths/userId_hoarder_bookId.yaml"

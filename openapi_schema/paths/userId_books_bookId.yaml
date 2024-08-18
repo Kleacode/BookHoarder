@@ -1,0 +1,36 @@
+patch:
+  summary: ユーザーが登録した本の情報を更新する
+  parameters:
+    - name: userId
+      in: path
+      required: true
+    - name: bookId
+      in: path
+      required: true
+  requestBody:
+    content:
+      'application/json':
+        schema:
+          $ref: "../components/schemas/books.yaml#/book"
+  responses:
+    "200":
+      description: 更新成功
+      content:
+        'application/json':
+          schema:
+            $ref: "../components/schemas/books.yaml#/book"
+    default:
+      $ref: "../components/responses/default_response.yaml"
+
+delete:
+  summary: ユーザーが登録した本を削除する
+  parameters:
+    - name: userId
+      in: path
+    - name: bookId
+      in: path
+  responses:
+    "204":
+      description: 削除成功
+    default:
+      $ref: "../components/responses/default_response.yaml"

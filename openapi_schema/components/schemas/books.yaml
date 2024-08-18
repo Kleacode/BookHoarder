@@ -9,6 +9,16 @@ book:
       format: int64
     title:
       type: string
+    userId:
+      type: integer
+    tagIds:
+      type: array
+      items: {
+        "type": "integer",
+        "format": "int64"
+      }
+        
+      
 
 books:
   type: array
