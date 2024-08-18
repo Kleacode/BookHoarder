@@ -1,12 +1,8 @@
 post:
   summary: ユーザーの積読リストに本を登録する
   parameters:
-    - name: userId
-      in: path
-      required: true
-    - name: bookId
-      in: path
-      required: true
+    - $ref: "../components/parameters/userId.yaml"
+    - $ref: "../components/parameters/bookId.yaml"
   requestBody:
     content:
       'application/json':
@@ -25,12 +21,8 @@ post:
 patch:
   summary: ユーザーの積読リストにある本の状態を更新する
   parameters:
-    - name: userId
-      in: path
-      required: true
-    - name: bookId
-      in: path
-      required: true
+    - $ref: "../components/parameters/userId.yaml"
+    - $ref: "../components/parameters/bookId.yaml"
   requestBody:
     content:
       'application/json':
@@ -49,12 +41,8 @@ patch:
 delete:
   summary: ユーザーの積読リストにある本を削除する
   parameters:
-    - name: userId
-      in: path
-      required: true
-    - name: bookId
-      in: path
-      required: true
+    - $ref: "../components/parameters/userId.yaml"
+    - $ref: "../components/parameters/bookId.yaml"
   responses:
     "204":
       description: 削除成功

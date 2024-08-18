@@ -1,0 +1,4 @@
+name: bookId
+in: path
+required: true
+schema: {type: integer}

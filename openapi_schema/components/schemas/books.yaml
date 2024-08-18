@@ -9,8 +9,6 @@ book:
       format: int64
     title:
       type: string
-    userId:
-      type: integer
     tagIds:
       type: array
       items: {
@@ -22,6 +20,5 @@ book:
 
 books:
   type: array
-  maxItems: 50
   items:
     $ref: "#/book"

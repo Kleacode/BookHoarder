@@ -13,6 +13,8 @@ paths:
       parameters:
         - name: title
           in: query
+          schema:
+            type: string
       responses:
         '200':
           description: 本の一覧
@@ -26,9 +28,7 @@ paths:
     get:
       summary: 特定の本1冊の情報を取得する
       parameters:
-        - name: bookId
-          in: path
-          required: true
+        - $ref: '#/components/parameters/bookId'
       responses:
         '200':
           description: 本の情報
@@ -42,12 +42,8 @@ paths:
     patch:
       summary: ユーザーが登録した本の情報を更新する
       parameters:
-        - name: userId
-          in: path
-          required: true
-        - name: bookId
-          in: path
-          required: true
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/bookId'
       requestBody:
         content:
           application/json:
@@ -65,10 +61,8 @@ paths:
     delete:
       summary: ユーザーが登録した本を削除する
       parameters:
-        - name: userId
-          in: path
-        - name: bookId
-          in: path
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/bookId'
       responses:
         '204':
           description: 削除成功
@@ -78,13 +72,19 @@ paths:
     get:
       summary: ユーザーの積読リストから、本の一覧を取得する。
       parameters:
-        - name: userId
-          in: path
-          required: true
+        - $ref: '#/components/parameters/userId'
         - name: status
           in: query
+          schema:
+            type: string
         - name: tags
           in: query
+          schema:
+            type: array
+            items:
+              type: integer
+            style: form
+            explode: false
       responses:
         '200':
           description: 本の一覧
@@ -97,9 +97,7 @@ paths:
     post:
       summary: 本を新しく登録する。そのままユーザーの積読リストにも登録する。
       parameters:
-        - name: userId
-          in: path
-          required: true
+        - $ref: '#/components/parameters/userId'
       requestBody:
         content:
           application/json:
@@ -118,12 +116,8 @@ paths:
     post:
       summary: ユーザーの積読リストに本を登録する
       parameters:
-        - name: userId
-          in: path
-          required: true
-        - name: bookId
-          in: path
-          required: true
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/bookId'
       requestBody:
         content:
           application/json:
@@ -141,12 +135,8 @@ paths:
     patch:
       summary: ユーザーの積読リストにある本の状態を更新する
       parameters:
-        - name: userId
-          in: path
-          required: true
-        - name: bookId
-          in: path
-          required: true
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/bookId'
       requestBody:
         content:
           application/json:
@@ -164,12 +154,8 @@ paths:
     delete:
       summary: ユーザーの積読リストにある本を削除する
       parameters:
-        - name: userId
-          in: path
-          required: true
-        - name: bookId
-          in: path
-          required: true
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/bookId'
       responses:
         '204':
           description: 削除成功
@@ -199,8 +185,6 @@ components:
           format: int64
         title:
           type: string
-        userId:
-          type: integer
         tagIds:
           type: array
           items:
@@ -208,7 +192,6 @@ components:
             format: int64
     books:
       type: array
-      maxItems: 50
       items:
         $ref: '#/components/schemas/book'
   responses:
@@ -218,3 +201,16 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/error'
+  parameters:
+    bookId:
+      name: bookId
+      in: path
+      required: true
+      schema:
+        type: integer
+    userId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: integer

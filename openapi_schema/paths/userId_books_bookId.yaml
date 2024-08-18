@@ -1,12 +1,8 @@
 patch:
   summary: ユーザーが登録した本の情報を更新する
   parameters:
-    - name: userId
-      in: path
-      required: true
-    - name: bookId
-      in: path
-      required: true
+    - $ref: "../components/parameters/userId.yaml"
+    - $ref: "../components/parameters/bookId.yaml"
   requestBody:
     content:
       'application/json':
@@ -25,10 +21,8 @@ patch:
 delete:
   summary: ユーザーが登録した本を削除する
   parameters:
-    - name: userId
-      in: path
-    - name: bookId
-      in: path
+    - $ref: "../components/parameters/userId.yaml"
+    - $ref: "../components/parameters/bookId.yaml"
   responses:
     "204":
       description: 削除成功
