@@ -1,0 +1,5 @@
+FROM node:22-slim
+
+WORKDIR /app
+
+RUN npm i -g @redocly/cli@latest
