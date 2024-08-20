@@ -21,17 +21,22 @@
 		"build:storybook": "storybook build",
 		"generate": "npm run generate:index && npm run generate:api",
 		"generate:index": "pnpx tsx tools/run_generate_index.ts",
-		"generate:api": "npx openapi-typescript ../openapi_schema/openapi.yaml --output tools/schemas/tsSchema.ts"
+		"generate:api": "npx openapi-typescript ../openapi_schema/openapi.yaml --output app/libs/schemas/tsSchema.ts"
 	},
 	"dependencies": {
 		"@remix-run/node": "^2.11.1",
 		"@remix-run/react": "^2.11.1",
 		"@remix-run/serve": "^2.11.1",
+		"axios": "^1.7.4",
 		"clsx": "^2.1.1",
 		"isbot": "^4.1.0",
 		"lodash": "^4.17.21",
 		"react": "^18.2.0",
-		"react-dom": "^18.2.0"
+		"react-dom": "^18.2.0",
+		"react-hook-form": "^7.52.2",
+		"swr": "^2.2.5",
+		"zod": "^3.23.8",
+		"zustand": "^4.5.5"
 	},
 	"devDependencies": {
 		"@chromatic-com/storybook": "^1.6.1",
@@ -60,6 +65,7 @@
 		"stylelint-config-standard": "^36.0.1",
 		"tailwindcss": "^3.4.4",
 		"tsx": "^4.17.0",
+		"type-fest": "^4.24.0",
 		"typescript": "^5.1.6",
 		"vite": "^5.1.0",
 		"vite-tsconfig-paths": "^4.2.1",
