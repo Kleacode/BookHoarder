@@ -1,8 +1,12 @@
-import Axios, { type AxiosResponse, type AxiosError } from "axios";
+import Axios, {
+	type AxiosResponse,
+	type AxiosError,
+	type AxiosInstance,
+} from "axios";
 import _ from "lodash";
 
 import { interceptCsrf } from "./interceptors/csrfInterceptor";
-import type * as schemaHelper from "@/libs/schemas/schemaHealper";
+import type * as SchemaHelper from "@/libs/schemas/schemaHealper";
 
 const API_URL = "";
 
@@ -22,29 +26,48 @@ axios.interceptors.request.use(interceptCsrf);
 /// typeの設定
 /// openapi-typescriptで生成した型のschemaをaxiosのrequest関数にあてる
 
+/// Method関連の型
+export type Get = "get";
+export type Delete = "delete";
+export type Post = "post";
+export type Put = "put";
+
 export type AxiosConfigWrapper<
-	Path extends schemaHelper.UrlPaths,
-	Method extends schemaHelper.HttpMethods,
+	Path extends SchemaHelper.UrlPaths,
+	Method extends SchemaHelper.HttpMethods,
 > = {
 	url: Path;
-	method: Method & schemaHelper.HttpMethodsFilteredByPath<Path>;
-	params?: schemaHelper.RequestParameters<Path, Method>;
-	data?: schemaHelper.RequestData<Path, Method>;
+	method: Method & SchemaHelper.HttpMethodsFilteredByPath<Path>;
+	params?: SchemaHelper.RequestParameters<Path, Method>;
+	data?: SchemaHelper.RequestData<Path, Method>;
 };
 
 type Response<
-	Path extends schemaHelper.UrlPaths,
-	Method extends schemaHelper.HttpMethods,
-> = AxiosResponse<schemaHelper.ResponseData<Path, Method>>;
+	Path extends SchemaHelper.UrlPaths,
+	Method extends SchemaHelper.HttpMethods,
+> = AxiosResponse<SchemaHelper.ResponseData<Path, Method>>;
 
 type Error<
-	Path extends schemaHelper.UrlPaths,
-	Method extends schemaHelper.HttpMethods,
-> = AxiosError<schemaHelper.ResponseErrorData<Path, Method>>;
+	Path extends SchemaHelper.UrlPaths,
+	Method extends SchemaHelper.HttpMethods,
+> = AxiosError<SchemaHelper.ResponseErrorData<Path, Method>>;
 
-class APIResponse<
-	Path extends schemaHelper.UrlPaths,
-	Method extends schemaHelper.HttpMethods,
+/// get, delete, post, put などの alias 関数で利用する型
+/// Method トリガーで Url を変えるため AxiosConfigWrapper とは別で用意する
+export type AxiosAliasWrapper<
+	Path extends SchemaHelper.UrlPaths,
+	Method extends SchemaHelper.HttpMethods,
+> = {
+	params?: SchemaHelper.RequestParameters<Path, Method>;
+	data?: SchemaHelper.RequestData<Path, Method>;
+};
+
+/// Responseを受け取るクラス
+
+export class APIResponse<
+	Paths,
+	Path extends SchemaHelper.UrlPaths,
+	Method extends SchemaHelper.HttpMethods,
 > {
 	private _response?: Response<Path, Method>;
 	private _error?: Error<Path, Method>;
@@ -73,44 +96,113 @@ class APIResponse<
 	}
 }
 
-export async function request<
-	Path extends schemaHelper.UrlPaths,
-	Method extends schemaHelper.HttpMethods,
->(
-	config: AxiosConfigWrapper<Path, Method>,
-	pathParams?: schemaHelper.PathParameters<Path, Method>,
-) {
-	const url = _.isEmpty(pathParams)
-		? config.url
-		: _replacePathParams(config.url, pathParams);
-	return axios
-		.request<
-			schemaHelper.ResponseData<Path, Method>,
-			Response<Path, Method>,
-			AxiosConfigWrapper<Path, Method>["data"]
-		>({ ...config, url })
-		.then((response) => {
-			return new APIResponse({ response });
-		})
-		.catch((error: Error<Path, Method>) => {
-			// 通信エラー発生時はresponseが返却されないため個別にエラー情報を返却
-			console.error(error);
-			return new APIResponse({ error });
+class Api {
+	private static instance: Api | null = null;
+	private axios: AxiosInstance;
+
+	private constructor() {
+		this.axios = Axios.create({
+			baseURL: API_URL,
 		});
+		// request
+		this.axios.interceptors.request.use(interceptCsrf);
+	}
+
+	public static getInstance(): Api {
+		if (!Api.instance) {
+			Api.instance = new Api();
+		}
+		return Api.instance;
+	}
+
+	async request<
+		Path extends SchemaHelper.UrlPaths,
+		Method extends SchemaHelper.HttpMethods,
+	>(
+		config: AxiosConfigWrapper<Path, Method>,
+		pathParams: SchemaHelper.PathParameters<Path, Method>,
+	) {
+		const url = this.#replacePathParams(config.url, pathParams);
+		return this.axios
+			.request<
+				SchemaHelper.ResponseData<Path, Method>,
+				Response<Path, Method>,
+				AxiosConfigWrapper<Path, Method>["data"]
+			>({ ...config, url })
+			.then((response) => {
+				return new APIResponse({ response });
+			})
+			.catch((error: Error<Path, Method>) => {
+				// 通信エラー発生時はresponseが返却されないため個別にエラー情報を返却
+				console.error(error);
+				return new APIResponse({ error });
+			});
+	}
+
+	/// baseURL内の`{パスパラメータ}`となっている箇所を与えた値で置き換える
+	#replacePathParams<
+		Path extends SchemaHelper.UrlPaths,
+		Method extends SchemaHelper.HttpMethods,
+	>(
+		baseURL: string,
+		pathParams: SchemaHelper.PathParameters<Path, Method>,
+	): string {
+		if (_.isEmpty(pathParams)) return baseURL;
+		let url = baseURL;
+		for (const [paramKey, paramValue] of Object.entries(pathParams)) {
+			const paramPlaceholder = `{${paramKey}}`;
+			url = url.replace(paramPlaceholder, String(paramValue));
+		}
+		return url;
+	}
+
+	/// Alias
+	/// Axiosの方ではprototypeを使って定義しているが、Genericsが必要な関係上、各aliasをベタ書きしている
+	async get<Path extends SchemaHelper.UrlPathsFilteredByMethod<Get>>(
+		url: Path,
+		pathParams: SchemaHelper.PathParameters<Path, Get>,
+		config?: AxiosAliasWrapper<Path, Get>,
+	) {
+		return this.request<Path, Get>(
+			{ ...config, url, method: "get", data: config?.data },
+			pathParams,
+		);
+	}
+
+	async delete<Path extends SchemaHelper.UrlPathsFilteredByMethod<Delete>>(
+		url: Path,
+		pathParams: SchemaHelper.PathParameters<Path, Delete>,
+		config?: AxiosAliasWrapper<Path, Delete>,
+	) {
+		return this.request<Path, Delete>(
+			{ ...config, url, method: "delete", data: config?.data },
+			pathParams,
+		);
+	}
+
+	async post<Path extends SchemaHelper.UrlPathsFilteredByMethod<Post>>(
+		url: Path,
+		pathParams: SchemaHelper.PathParameters<Path, Post>,
+		data: SchemaHelper.RequestData<Path, Post>,
+		config?: AxiosAliasWrapper<Path, Post>,
+	) {
+		return this.request<Path, Post>(
+			{ ...config, url, method: "post", data },
+			pathParams,
+		);
+	}
+
+	async put<Path extends SchemaHelper.UrlPathsFilteredByMethod<Put>>(
+		url: Path,
+		pathParams: SchemaHelper.PathParameters<Path, Put>,
+		data: SchemaHelper.RequestData<Path, Put>,
+		config?: AxiosAliasWrapper<Path, Put>,
+	) {
+		return this.request<Path, Put>(
+			{ ...config, url, method: "put", data },
+			pathParams,
+		);
+	}
 }
 
-/// baseURL内の`{パスパラメータ}`となっている箇所を与えた値で置き換える
-function _replacePathParams<
-	Path extends schemaHelper.UrlPaths,
-	Method extends schemaHelper.HttpMethods,
->(
-	baseURL: string,
-	pathParams: schemaHelper.PathParameters<Path, Method>,
-): string {
-	let url = baseURL;
-	for (const [paramKey, paramValue] of Object.entries(pathParams || {})) {
-		const paramPlaceholder = `{${paramKey}}`;
-		url = url.replace(paramPlaceholder, String(paramValue));
-	}
-	return url;
-}
+export const api = Api.getInstance();

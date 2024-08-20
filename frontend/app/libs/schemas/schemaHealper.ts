@@ -35,3 +35,8 @@ export type PathParameters<
 	Path extends UrlPaths,
 	Method extends HttpMethods,
 > = Get<paths, `${Path}.${Method}.parameters.path`>;
+
+/// methodを指定した際に決まるUrlの型
+export type UrlPathsFilteredByMethod<Method extends HttpMethods> = {
+	[K in UrlPaths]: Method extends keyof paths[K] ? K : never;
+}[keyof paths & string];
