@@ -10,9 +10,9 @@ get:
       schema:
         type: array
         items: 
-          type: "integer"
-        style: form
-        explode: false
+          type: integer
+      explode: false
+      style: form
 
   responses:
     "200":

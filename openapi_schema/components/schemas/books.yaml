@@ -2,21 +2,22 @@ book:
   type: object
   required:
     - bookId
+    - userId
     - title
   properties:
     bookId:
+      type: integer
+      format: int64
+    userId:
       type: integer
       format: int64
     title:
       type: string
     tagIds:
       type: array
-      items: {
-        "type": "integer",
-        "format": "int64"
-      }
-        
-      
+      items: 
+        type: integer
+        format: int64
 
 books:
   type: array
