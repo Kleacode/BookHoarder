@@ -1,0 +1,62 @@
+post:
+  summary: ユーザーの積読リストに本を登録する
+  parameters:
+    - name: userId
+      in: path
+      required: true
+    - name: bookId
+      in: path
+      required: true
+  requestBody:
+    content:
+      'application/json':
+        schema: 
+          $ref: "../components/schemas/books.yaml#/book"
+  responses:
+    "201":
+      description: 登録成功
+      content:
+        'application/json':
+          schema:
+            $ref: "../components/schemas/books.yaml#/book"
+    default:
+      $ref: "../components/responses/default_response.yaml"
+
+patch:
+  summary: ユーザーの積読リストにある本の状態を更新する
+  parameters:
+    - name: userId
+      in: path
+      required: true
+    - name: bookId
+      in: path
+      required: true
+  requestBody:
+    content:
+      'application/json':
+        schema: 
+          $ref: "../components/schemas/books.yaml#/book"
+  responses:
+    "200":
+      description: 更新成功
+      content:
+        'application/json':
+          schema:
+            $ref: "../components/schemas/books.yaml#/book"
+    default:
+      $ref: "../components/responses/default_response.yaml"
+
+delete:
+  summary: ユーザーの積読リストにある本を削除する
+  parameters:
+    - name: userId
+      in: path
+      required: true
+    - name: bookId
+      in: path
+      required: true
+  responses:
+    "204":
+      description: 削除成功
+    default:
+      $ref: "../components/responses/default_response.yaml"

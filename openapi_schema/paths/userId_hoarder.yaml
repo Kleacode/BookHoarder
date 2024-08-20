@@ -1,0 +1,42 @@
+get:
+  summary: ユーザーの積読リストから、本の一覧を取得する。
+  parameters:
+    - name: userId
+      in: path
+      required: true
+    - name: status
+      in: query
+    - name: tags
+      in: query
+  responses:
+    "200":
+      description: 本の一覧
+      content:
+        'application/json':
+          schema:
+            $ref: "../components/schemas/books.yaml#/books"
+    default:
+      $ref: "../components/responses/default_response.yaml"
+
+post:
+  summary: 本を新しく登録する。そのままユーザーの積読リストにも登録する。
+  parameters:
+    - name: userId
+      in: path
+      required: true
+
+  requestBody:
+    content:
+      'application/json':
+        schema:
+          $ref: "../components/schemas/books.yaml#/book"
+  
+  responses:
+    "201":
+      description: 登録成功
+      content:
+        'application/json':
+          schema:
+            $ref: "../components/schemas/books.yaml#/book"
+    default:
+      $ref: "../components/responses/default_response.yaml"
