@@ -1,9 +1,7 @@
 get:
   summary: 特定の本1冊の情報を取得する
   parameters:
-    - name: bookId
-      in: path
-      required: true
+    - $ref: "../components/parameters/bookId.yaml"
   responses:
     "200":
       description: 本の情報

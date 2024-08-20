@@ -1,13 +1,19 @@
 get:
   summary: ユーザーの積読リストから、本の一覧を取得する。
   parameters:
-    - name: userId
-      in: path
-      required: true
+    - $ref: "../components/parameters/userId.yaml"
     - name: status
       in: query
+      schema: {type: string}
     - name: tags
       in: query
+      schema:
+        type: array
+        items: 
+          type: integer
+      explode: false
+      style: form
+
   responses:
     "200":
       description: 本の一覧
@@ -21,10 +27,7 @@ get:
 post:
   summary: 本を新しく登録する。そのままユーザーの積読リストにも登録する。
   parameters:
-    - name: userId
-      in: path
-      required: true
-
+    - $ref: "../components/parameters/userId.yaml"
   requestBody:
     content:
       'application/json':

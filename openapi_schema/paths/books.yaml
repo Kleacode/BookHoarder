@@ -3,6 +3,7 @@ get:
   parameters:
     - name: title
       in: query
+      schema: {type: string}
   responses:
     "200":
       description: 本の一覧

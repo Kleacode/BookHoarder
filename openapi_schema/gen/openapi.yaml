@@ -1,0 +1,216 @@
+openapi: 3.0.0
+info:
+  title: BookHoarder API
+  description: description
+  version: 0.0.1
+servers:
+  - url: http://localhost:8080
+    description: dev server
+paths:
+  /books:
+    get:
+      summary: 登録されている本を取得する
+      parameters:
+        - name: title
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 本の一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/books'
+        default:
+          $ref: '#/components/responses/default_response'
+  /books/{bookId}:
+    get:
+      summary: 特定の本1冊の情報を取得する
+      parameters:
+        - $ref: '#/components/parameters/bookId'
+      responses:
+        '200':
+          description: 本の情報
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+        default:
+          $ref: '#/components/responses/default_response'
+  /{userId}/books/{bookId}:
+    patch:
+      summary: ユーザーが登録した本の情報を更新する
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/bookId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/book'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+        default:
+          $ref: '#/components/responses/default_response'
+    delete:
+      summary: ユーザーが登録した本を削除する
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/bookId'
+      responses:
+        '204':
+          description: 削除成功
+        default:
+          $ref: '#/components/responses/default_response'
+  /{userId}/hoarder:
+    get:
+      summary: ユーザーの積読リストから、本の一覧を取得する。
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: tags
+          in: query
+          schema:
+            type: array
+            items:
+              type: integer
+            style: form
+            explode: false
+      responses:
+        '200':
+          description: 本の一覧
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/books'
+        default:
+          $ref: '#/components/responses/default_response'
+    post:
+      summary: 本を新しく登録する。そのままユーザーの積読リストにも登録する。
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/book'
+      responses:
+        '201':
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+        default:
+          $ref: '#/components/responses/default_response'
+  /{userId}/hoarder/{bookId}:
+    post:
+      summary: ユーザーの積読リストに本を登録する
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/bookId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/book'
+      responses:
+        '201':
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+        default:
+          $ref: '#/components/responses/default_response'
+    patch:
+      summary: ユーザーの積読リストにある本の状態を更新する
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/bookId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/book'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+        default:
+          $ref: '#/components/responses/default_response'
+    delete:
+      summary: ユーザーの積読リストにある本を削除する
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/bookId'
+      responses:
+        '204':
+          description: 削除成功
+        default:
+          $ref: '#/components/responses/default_response'
+components:
+  schemas:
+    error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+    book:
+      type: object
+      required:
+        - bookId
+        - title
+      properties:
+        bookId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        tagIds:
+          type: array
+          items:
+            type: integer
+            format: int64
+    books:
+      type: array
+      items:
+        $ref: '#/components/schemas/book'
+  responses:
+    default_response:
+      description: unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/error'
+  parameters:
+    bookId:
+      name: bookId
+      in: path
+      required: true
+      schema:
+        type: integer
+    userId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: integer
