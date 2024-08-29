@@ -21,7 +21,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/books'
+                type: array
+                items:
+                  $ref: '#/components/schemas/exist_book'
         default:
           $ref: '#/components/responses/default_response'
   /books/{bookId}:
@@ -35,7 +37,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/book'
+                $ref: '#/components/schemas/exist_book'
         default:
           $ref: '#/components/responses/default_response'
   /{userId}/books/{bookId}:
@@ -48,14 +50,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/book'
+              $ref: '#/components/schemas/post_book'
       responses:
         '200':
           description: 更新成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/book'
+                $ref: '#/components/schemas/exist_book'
         default:
           $ref: '#/components/responses/default_response'
     delete:
@@ -91,7 +93,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/books'
+                type: array
+                items:
+                  $ref: '#/components/schemas/hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
     post:
@@ -102,14 +106,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/book'
+              $ref: '#/components/schemas/post_hoarder'
       responses:
         '201':
           description: 登録成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/book'
+                $ref: '#/components/schemas/hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
   /{userId}/hoarder/{bookId}:
@@ -122,14 +126,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/book'
+              $ref: '#/components/schemas/post_hoarder'
       responses:
         '201':
           description: 登録成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/book'
+                $ref: '#/components/schemas/hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
     patch:
@@ -141,14 +145,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/book'
+              $ref: '#/components/schemas/post_hoarder'
       responses:
         '200':
           description: 更新成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/book'
+                $ref: '#/components/schemas/hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
     delete:
@@ -174,19 +178,9 @@ components:
           format: int32
         message:
           type: string
-    book:
+    book_info:
       type: object
-      required:
-        - bookId
-        - userId
-        - title
       properties:
-        bookId:
-          type: integer
-          format: int64
-        userId:
-          type: integer
-          format: int64
         title:
           type: string
         tagIds:
@@ -194,10 +188,43 @@ components:
           items:
             type: integer
             format: int64
-    books:
-      type: array
-      items:
-        $ref: '#/components/schemas/book'
+    new_book:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        book_info:
+          $ref: '#/components/schemas/book_info'
+    exist_book:
+      type: object
+      properties:
+        details:
+          $ref: '#/components/schemas/new_book'
+        bookId:
+          type: integer
+          format: int64
+    post_book:
+      type: object
+      properties:
+        book_info:
+          $ref: '#/components/schemas/book_info'
+    hoarder_book:
+      type: object
+      properties:
+        details:
+          $ref: '#/components/schemas/exist_book'
+        statusId:
+          type: integer
+          format: int64
+    post_hoarder:
+      type: object
+      properties:
+        book_info:
+          $ref: '#/components/schemas/book_info'
+        statusId:
+          type: integer
+          format: int64
   responses:
     default_response:
       description: unexpected error
