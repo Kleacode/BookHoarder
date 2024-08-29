@@ -16,6 +16,7 @@ type Book struct {
 	BookId int64    `json:"bookId"`
 	TagIds *[]int64 `json:"tagIds,omitempty"`
 	Title  string   `json:"title"`
+	UserId int64    `json:"userId"`
 }
 
 // Books defines model for books.
@@ -242,7 +243,7 @@ func (siw *ServerInterfaceWrapper) GetUserIdHoarder(c *gin.Context) {
 
 	// ------------- Optional query parameter "tags" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "tags", c.Request.URL.Query(), &params.Tags)
+	err = runtime.BindQueryParameter("form", false, false, "tags", c.Request.URL.Query(), &params.Tags)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter tags: %w", err), http.StatusBadRequest)
 		return

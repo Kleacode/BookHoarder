@@ -83,8 +83,8 @@ paths:
             type: array
             items:
               type: integer
-            style: form
-            explode: false
+          explode: false
+          style: form
       responses:
         '200':
           description: 本の一覧
@@ -178,9 +178,13 @@ components:
       type: object
       required:
         - bookId
+        - userId
         - title
       properties:
         bookId:
+          type: integer
+          format: int64
+        userId:
           type: integer
           format: int64
         title:
