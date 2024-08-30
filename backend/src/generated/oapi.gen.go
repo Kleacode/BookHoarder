@@ -11,21 +11,45 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
-// Book defines model for book.
-type Book struct {
-	BookId int64    `json:"bookId"`
+// BookInfo defines model for book_info.
+type BookInfo struct {
 	TagIds *[]int64 `json:"tagIds,omitempty"`
-	Title  string   `json:"title"`
-	UserId int64    `json:"userId"`
+	Title  *string  `json:"title,omitempty"`
 }
-
-// Books defines model for books.
-type Books = []Book
 
 // Error defines model for error.
 type Error struct {
 	Code    int32  `json:"code"`
 	Message string `json:"message"`
+}
+
+// ExistBook defines model for exist_book.
+type ExistBook struct {
+	BookId  *int64   `json:"bookId,omitempty"`
+	Details *NewBook `json:"details,omitempty"`
+}
+
+// HoarderBook defines model for hoarder_book.
+type HoarderBook struct {
+	Details  *ExistBook `json:"details,omitempty"`
+	StatusId *int64     `json:"statusId,omitempty"`
+}
+
+// NewBook defines model for new_book.
+type NewBook struct {
+	BookInfo *BookInfo `json:"book_info,omitempty"`
+	UserId   *int64    `json:"userId,omitempty"`
+}
+
+// PostBook defines model for post_book.
+type PostBook struct {
+	BookInfo *BookInfo `json:"book_info,omitempty"`
+}
+
+// PostHoarder defines model for post_hoarder.
+type PostHoarder struct {
+	BookInfo *BookInfo `json:"book_info,omitempty"`
+	StatusId *int64    `json:"statusId,omitempty"`
 }
 
 // BookId defines model for bookId.
@@ -49,16 +73,16 @@ type GetUserIdHoarderParams struct {
 }
 
 // PatchUserIdBooksBookIdJSONRequestBody defines body for PatchUserIdBooksBookId for application/json ContentType.
-type PatchUserIdBooksBookIdJSONRequestBody = Book
+type PatchUserIdBooksBookIdJSONRequestBody = PostBook
 
 // PostUserIdHoarderJSONRequestBody defines body for PostUserIdHoarder for application/json ContentType.
-type PostUserIdHoarderJSONRequestBody = Book
+type PostUserIdHoarderJSONRequestBody = PostHoarder
 
 // PatchUserIdHoarderBookIdJSONRequestBody defines body for PatchUserIdHoarderBookId for application/json ContentType.
-type PatchUserIdHoarderBookIdJSONRequestBody = Book
+type PatchUserIdHoarderBookIdJSONRequestBody = PostHoarder
 
 // PostUserIdHoarderBookIdJSONRequestBody defines body for PostUserIdHoarderBookId for application/json ContentType.
-type PostUserIdHoarderBookIdJSONRequestBody = Book
+type PostUserIdHoarderBookIdJSONRequestBody = PostHoarder
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {

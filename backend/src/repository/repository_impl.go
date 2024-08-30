@@ -36,103 +36,95 @@ func (r Repository) DeleteUserIdHoarderBookId(c context.Context, userId int, boo
 }
 
 // GetBooks implements usecases.RepositoryInterface.
-func (r Repository) GetBooks(c context.Context, params api.GetBooksParams) ([]api.Book, error) {
+func (r Repository) GetBooks(c context.Context, params api.GetBooksParams) ([]usecases.BookRecord, error) {
 	var books []usecases.BookRecord
-	var result []api.Book
-
 	err := r.db.Select(&books, "SELECT * FROM books")
 	if err != nil {
 		return nil, err
 	}
-	for _, e := range books {
-		result = append(result, api.Book{BookId: e.Id, UserId: e.UserId, Title: e.Title, TagIds: (*[]int64)(&e.TagIds)})
-	}
-	return result, err
+	return books, err
 }
 
 // GetBooksBookId implements usecases.RepositoryInterface.
-func (r Repository) GetBooksBookId(c context.Context, bookId int) (api.Book, error) {
+func (r Repository) GetBooksBookId(c context.Context, bookId int) (usecases.BookRecord, error) {
 	var book usecases.BookRecord
 	err := r.db.Get(&book, "SELECT * FROM books WHERE id = $1", bookId)
 	if err != nil {
-		return api.Book{}, err
+		return usecases.BookRecord{}, err
 	}
-	return api.Book{BookId: int64(bookId), Title: book.Title, TagIds: (*[]int64)(&book.TagIds)}, nil
+	return book, nil
 }
 
 // GetUserIdHoarder implements usecases.RepositoryInterface.
-func (r Repository) GetUserIdHoarder(c context.Context, userId int, params api.GetUserIdHoarderParams) ([]api.Book, error) {
-	var books []usecases.BookRecord
-	err := r.db.Select(&books, `SELECT * FROM books WHERE id IN (SELECT book_id FROM user_book_status WHERE user_id = $1)`, userId)
+func (r Repository) GetUserIdHoarder(c context.Context, userId int, params api.GetUserIdHoarderParams) ([]usecases.UserHoarderRecord, error) {
+	var books []usecases.UserHoarderRecord
+	err := r.db.Select(&books, `SELECT books.*, user_book_status.status_id FROM books 
+	INNER JOIN user_book_status
+	ON books.id = user_book_status.book_id
+	WHERE books.user_id = $1`, userId)
 	if err != nil {
 		return nil, err
 	}
-	var result []api.Book
-	for _, e := range books {
-		result = append(result, api.Book{
-			BookId: int64(e.Id),
-			Title:  e.Title,
-			TagIds: (*[]int64)(&e.TagIds),
-		})
-	}
-	return result, err
+	return books, err
 }
 
 // PatchUserIdBooksBookId implements usecases.RepositoryInterface.
-func (r Repository) PatchUserIdBooksBookId(c context.Context, data usecases.BookRecord) (api.Book, error) {
+func (r Repository) PatchUserIdBooksBookId(c context.Context, data usecases.BookRecord) (api.ExistBook, error) {
 	result, err := r.db.NamedExec("UPDATE books SET title=:title, tags_id=:tags_id WHERE id=:id AND user_id=:user_id ", data)
 	if err != nil {
-		return api.Book{}, err
+		return api.ExistBook{}, err
 	}
 	if rows, _ := result.RowsAffected(); rows == 0 {
-		return api.Book{}, domain.ErrorNotFound
+		return api.ExistBook{}, domain.ErrorNotFound
 	}
-	return api.Book{}, nil
+	return data.ToExistBook(), nil
 }
 
 // PatchUserIdHoarderBookId implements usecases.RepositoryInterface.
-func (r Repository) PatchUserIdHoarderBookId(c context.Context, data usecases.HoarderRecord) (api.Book, error) {
+func (r Repository) PatchUserIdHoarderBookId(c context.Context, data usecases.HoarderRecord) (api.HoarderBook, error) {
 	result, err := r.db.NamedExec("UPDATE user_book_status SET status_id=:status_id WHERE user_id=:user_id AND book_id=:book_id", data)
 	if err != nil {
-		return api.Book{}, err
+		return api.HoarderBook{}, err
 	}
 	if rows, _ := result.RowsAffected(); rows == 0 {
-		return api.Book{}, domain.ErrorNotFound
+		return api.HoarderBook{}, domain.ErrorNotFound
 	}
-	return api.Book{}, nil
+	// TODO
+	return api.HoarderBook{}, nil
 }
 
 // PostUserIdHoarder implements usecases.RepositoryInterface.
-func (r Repository) PostUserIdHoarder(c context.Context, data usecases.BookRecord, statusId int) (api.Book, error) {
+func (r Repository) PostUserIdHoarder(c context.Context, data usecases.BookRecord, statusId int) (api.HoarderBook, error) {
 	var createdId int
 	err := r.db.Get(&createdId, "INSERT INTO books (title, user_id, tags_id) VALUES ($1, $2, $3) RETURNING id", data.Title, data.UserId, pq.Array(data.TagIds))
 	if err != nil {
-		return api.Book{}, err
+		return api.HoarderBook{}, err
 	}
 
 	if createdId == 0 {
-		return api.Book{}, domain.ErrorFailedInsert
+		return api.HoarderBook{}, domain.ErrorFailedInsert
 	}
 
 	data.Id = int64(createdId)
 	_, err = r.PostUserIdHoarderBookId(c, data, statusId)
 	if err != nil {
-		return api.Book{}, err
+		return api.HoarderBook{}, err
 	}
-	return api.Book{}, nil
+
+	return data.ToHoarderBook(int64(statusId)), nil
 }
 
 // PostUserIdHoarderBookId implements usecases.RepositoryInterface.
-func (r Repository) PostUserIdHoarderBookId(c context.Context, data usecases.BookRecord, statusId int) (api.Book, error) {
+func (r Repository) PostUserIdHoarderBookId(c context.Context, data usecases.BookRecord, statusId int) (api.HoarderBook, error) {
 	var createdId int
 	err := r.db.Get(&createdId, "INSERT INTO user_book_status (user_id, book_id, status_id) VALUES ($1, $2, $3) RETURNING id", data.UserId, data.Id, statusId)
 	if err != nil {
-		return api.Book{}, err
+		return api.HoarderBook{}, err
 	}
 
 	if createdId == 0 {
-		return api.Book{}, domain.ErrorFailedInsert
+		return api.HoarderBook{}, domain.ErrorFailedInsert
 	}
 
-	return api.Book{}, nil
+	return data.ToHoarderBook(int64(statusId)), nil
 }

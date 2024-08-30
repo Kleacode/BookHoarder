@@ -60,15 +60,13 @@ func (h *Handler) GetUserIdHoarder(c *gin.Context, userId int, params api.GetUse
 
 // PatchUserIdBooksBookId implements api.ServerInterface.
 func (h *Handler) PatchUserIdBooksBookId(c *gin.Context, userId int, bookId int) {
-	var book api.Book
+	var book api.PostBook
 	if err := c.BindJSON(&book); err != nil {
 		c.JSON(domain.GetStatusCode(err), err.Error())
 		return
 	}
-	book.UserId = int64(userId)
-	book.BookId = int64(bookId)
 
-	patch, err := h.service.PatchUserIdBooksBookId(c, book)
+	patch, err := h.service.PatchUserIdBooksBookId(c, book, userId, bookId)
 
 	if err != nil {
 		c.JSON(domain.GetStatusCode(err), err.Error())
@@ -80,14 +78,12 @@ func (h *Handler) PatchUserIdBooksBookId(c *gin.Context, userId int, bookId int)
 
 // PatchUserIdHoarderBookId implements api.ServerInterface.
 func (h *Handler) PatchUserIdHoarderBookId(c *gin.Context, userId int, bookId int) {
-	var book api.Book
+	var book api.PostHoarder
 	if err := c.BindJSON(&book); err != nil {
 		return
 	}
-	book.UserId = int64(userId)
-	book.BookId = int64(bookId)
 
-	patch, err := h.service.PatchUserIdHoarderBookId(c, book)
+	patch, err := h.service.PatchUserIdHoarderBookId(c, book, userId, bookId)
 
 	if err != nil {
 		c.JSON(domain.GetStatusCode(err), err.Error())
@@ -99,13 +95,12 @@ func (h *Handler) PatchUserIdHoarderBookId(c *gin.Context, userId int, bookId in
 
 // PostUserIdHoarder implements api.ServerInterface.
 func (h *Handler) PostUserIdHoarder(c *gin.Context, userId int) {
-	var book api.Book
+	var book api.PostHoarder
 	if err := c.BindJSON(&book); err != nil {
 		return
 	}
-	book.UserId = int64(userId)
 
-	post, err := h.service.PostUserIdHoarder(c, book)
+	post, err := h.service.PostUserIdHoarder(c, book, userId)
 	if err != nil {
 		c.JSON(domain.GetStatusCode(err), err.Error())
 		return
@@ -116,14 +111,12 @@ func (h *Handler) PostUserIdHoarder(c *gin.Context, userId int) {
 
 // PostUserIdHoarderBookId implements api.ServerInterface.
 func (h *Handler) PostUserIdHoarderBookId(c *gin.Context, userId int, bookId int) {
-	var book api.Book
+	var book api.PostHoarder
 	if err := c.BindJSON(&book); err != nil {
 		return
 	}
-	book.UserId = int64(userId)
-	book.BookId = int64(bookId)
 
-	post, err := h.service.PostUserIdHoarderBookId(c, book)
+	post, err := h.service.PostUserIdHoarderBookId(c, book, userId, bookId)
 	if err != nil {
 		c.JSON(domain.GetStatusCode(err), err.Error())
 		return

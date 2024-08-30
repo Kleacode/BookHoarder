@@ -7,16 +7,16 @@ import (
 )
 
 type ServiceInterface interface {
-	GetBooks(c *gin.Context, params api.GetBooksParams) (api.Books, error)
-	GetBooksBookId(c *gin.Context, bookId int) (api.Book, error)
+	GetBooks(c *gin.Context, params api.GetBooksParams) ([]api.ExistBook, error)
+	GetBooksBookId(c *gin.Context, bookId int) (api.ExistBook, error)
 
-	PostUserIdHoarder(c *gin.Context, book api.Book) (api.Book, error)
-	PostUserIdHoarderBookId(c *gin.Context, book api.Book) (api.Book, error)
+	PostUserIdHoarder(c *gin.Context, book api.PostHoarder, userId int) (api.HoarderBook, error)
+	PostUserIdHoarderBookId(c *gin.Context, book api.PostHoarder, userId int, bookId int) (api.HoarderBook, error)
 
-	PatchUserIdBooksBookId(c *gin.Context, book api.Book) (api.Book, error)
-	PatchUserIdHoarderBookId(c *gin.Context, book api.Book) (api.Book, error)
+	PatchUserIdBooksBookId(c *gin.Context, book api.PostBook, userId int, bookId int) (api.ExistBook, error)
+	PatchUserIdHoarderBookId(c *gin.Context, book api.PostHoarder, userId int, bookId int) (api.HoarderBook, error)
 
-	GetUserIdHoarder(c *gin.Context, userId int, params api.GetUserIdHoarderParams) (api.Books, error)
+	GetUserIdHoarder(c *gin.Context, userId int, params api.GetUserIdHoarderParams) ([]api.HoarderBook, error)
 
 	DeleteUserIdBooksBookId(c *gin.Context, userId int, bookId int) error
 	DeleteUserIdHoarderBookId(c *gin.Context, userId int, bookId int) error
