@@ -15,7 +15,7 @@ psql -v ON_ERROR_STOP=1 --username ${POSTGRES_USER} --dbname ${POSTGRES_DB} <<-E
 	  id        SERIAL PRIMARY KEY,
 
 	  title     VARCHAR(100),
-	  user_id	INT NOT NULL,
+	  user_id	INT REFERENCES users(id) NOT NULL,
 	  tags_id	INT[]
 	);
 	INSERT INTO books (title, user_id) VALUES ('initbook', 1);
@@ -34,9 +34,9 @@ psql -v ON_ERROR_STOP=1 --username ${POSTGRES_USER} --dbname ${POSTGRES_DB} <<-E
 
 	  name      VARCHAR(50)
 	);
-	INSERT INTO status (name) VALUES ('tag1');
-	INSERT INTO status (name) VALUES ('tag2');
-	INSERT INTO status (name) VALUES ('tag3');
+	INSERT INTO tags (name) VALUES ('tag1');
+	INSERT INTO tags (name) VALUES ('tag2');
+	INSERT INTO tags (name) VALUES ('tag3');
 
 	CREATE TABLE user_book_status(
 	  id        SERIAL PRIMARY KEY,
