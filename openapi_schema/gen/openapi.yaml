@@ -189,42 +189,40 @@ components:
             type: integer
             format: int64
     new_book:
-      type: object
-      properties:
-        userId:
-          type: integer
-          format: int64
-        book_info:
-          $ref: '#/components/schemas/book_info'
+      allOf:
+        - $ref: '#/components/schemas/book_info'
+        - properties:
+            userId:
+              type: integer
+              format: int64
     exist_book:
-      type: object
-      properties:
-        details:
-          $ref: '#/components/schemas/new_book'
-        bookId:
-          type: integer
-          format: int64
+      allOf:
+        - $ref: '#/components/schemas/new_book'
+        - properties:
+            bookId:
+              type: integer
+              format: int64
     post_book:
-      type: object
-      properties:
-        book_info:
-          $ref: '#/components/schemas/book_info'
+      allOf:
+        - $ref: '#/components/schemas/book_info'
+    status:
+      type: string
+      enum:
+        - todo
+        - wip
+        - done
     hoarder_book:
-      type: object
-      properties:
-        details:
-          $ref: '#/components/schemas/exist_book'
-        statusId:
-          type: integer
-          format: int64
+      allOf:
+        - $ref: '#/components/schemas/exist_book'
+        - properties:
+            status:
+              $ref: '#/components/schemas/status'
     post_hoarder:
-      type: object
-      properties:
-        book_info:
-          $ref: '#/components/schemas/book_info'
-        statusId:
-          type: integer
-          format: int64
+      allOf:
+        - $ref: '#/components/schemas/book_info'
+        - properties:
+            status:
+              $ref: '#/components/schemas/status'
   responses:
     default_response:
       description: unexpected error

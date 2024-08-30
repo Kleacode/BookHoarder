@@ -11,6 +11,13 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+// Defines values for Status.
+const (
+	Done Status = "done"
+	Todo Status = "todo"
+	Wip  Status = "wip"
+)
+
 // BookInfo defines model for book_info.
 type BookInfo struct {
 	TagIds *[]int64 `json:"tagIds,omitempty"`
@@ -25,32 +32,40 @@ type Error struct {
 
 // ExistBook defines model for exist_book.
 type ExistBook struct {
-	BookId  *int64   `json:"bookId,omitempty"`
-	Details *NewBook `json:"details,omitempty"`
+	BookId *int64   `json:"bookId,omitempty"`
+	TagIds *[]int64 `json:"tagIds,omitempty"`
+	Title  *string  `json:"title,omitempty"`
+	UserId *int64   `json:"userId,omitempty"`
 }
 
 // HoarderBook defines model for hoarder_book.
 type HoarderBook struct {
-	Details  *ExistBook `json:"details,omitempty"`
-	StatusId *int64     `json:"statusId,omitempty"`
+	BookId *int64   `json:"bookId,omitempty"`
+	Status *Status  `json:"status,omitempty"`
+	TagIds *[]int64 `json:"tagIds,omitempty"`
+	Title  *string  `json:"title,omitempty"`
+	UserId *int64   `json:"userId,omitempty"`
 }
 
 // NewBook defines model for new_book.
 type NewBook struct {
-	BookInfo *BookInfo `json:"book_info,omitempty"`
-	UserId   *int64    `json:"userId,omitempty"`
+	TagIds *[]int64 `json:"tagIds,omitempty"`
+	Title  *string  `json:"title,omitempty"`
+	UserId *int64   `json:"userId,omitempty"`
 }
 
 // PostBook defines model for post_book.
-type PostBook struct {
-	BookInfo *BookInfo `json:"book_info,omitempty"`
-}
+type PostBook = BookInfo
 
 // PostHoarder defines model for post_hoarder.
 type PostHoarder struct {
-	BookInfo *BookInfo `json:"book_info,omitempty"`
-	StatusId *int64    `json:"statusId,omitempty"`
+	Status *Status  `json:"status,omitempty"`
+	TagIds *[]int64 `json:"tagIds,omitempty"`
+	Title  *string  `json:"title,omitempty"`
 }
+
+// Status defines model for status.
+type Status string
 
 // BookId defines model for bookId.
 type BookId = int

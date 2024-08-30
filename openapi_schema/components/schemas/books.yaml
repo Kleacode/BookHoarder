@@ -9,44 +9,45 @@ book_info:
         type: integer
         format: int64
 
+components:
+  schemas:
+    status:
+      type: string
+      enum:
+        - "todo"
+        - "wip"
+        - "done"
+
 new_book:
-  type: object
-  properties:
-    userId:
-      type: integer
-      format: int64
-    book_info:
-      $ref: "#/book_info"
+  allOf:
+    - $ref: "#/book_info"
+    - properties:
+        userId:
+          type: integer
+          format: int64
 
 exist_book:
-  type: object
-  properties:
-    details:
-      $ref: "#/new_book"
-    bookId:
-      type: integer
-      format: int64
+  allOf:
+    - $ref: "#/new_book"
+    - properties:
+        bookId:
+          type: integer
+          format: int64
 
 hoarder_book:
-  type: object
-  properties:
-    details:
-      $ref: "#/exist_book"
-    statusId:
-      type: integer
-      format: int64
+  allOf:
+    - $ref: "#/exist_book"
+    - properties:
+        status:
+          $ref: "#/components/schemas/status"
 
 post_book:
-  type: object
-  properties:
-    book_info:
-        $ref: "#/book_info"
+  allOf:
+    - $ref: "#/book_info"
 
 post_hoarder:
-  type: object
-  properties:
-    book_info:
-        $ref: "#/book_info"
-    statusId:
-      type: integer
-      format: int64
+  allOf:
+    - $ref: "#/book_info"
+    - properties:
+        status:
+          $ref: "#/components/schemas/status"
