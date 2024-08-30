@@ -111,7 +111,7 @@ func (r Repository) PostUserIdHoarder(c context.Context, data usecases.BookRecor
 		return api.HoarderBook{}, err
 	}
 
-	return data.ToHoarderBook(int64(statusId)), nil
+	return data.ToHoarderBook(int64(statusId))
 }
 
 // PostUserIdHoarderBookId implements usecases.RepositoryInterface.
@@ -126,5 +126,5 @@ func (r Repository) PostUserIdHoarderBookId(c context.Context, data usecases.Boo
 		return api.HoarderBook{}, domain.ErrorFailedInsert
 	}
 
-	return data.ToHoarderBook(int64(statusId)), nil
+	return data.ToHoarderBook(int64(statusId))
 }

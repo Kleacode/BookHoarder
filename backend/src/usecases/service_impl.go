@@ -50,7 +50,11 @@ func (s Service) GetUserIdHoarder(c *gin.Context, userId int, params api.GetUser
 
 	var result []api.HoarderBook
 	for _, e := range books {
-		result = append(result, e.ToHoarderBook())
+		r, err := e.ToHoarderBook()
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, r)
 	}
 	return result, nil
 }
@@ -60,8 +64,8 @@ func (s Service) PatchUserIdBooksBookId(c *gin.Context, book api.PostBook, userI
 	result, err := s.repo.PatchUserIdBooksBookId(c, BookRecord{
 		Id:     int64(bookId),
 		UserId: int64(userId),
-		Title:  *book.BookInfo.Title,
-		TagIds: *book.BookInfo.TagIds,
+		Title:  *book.Title,
+		TagIds: *book.TagIds,
 	})
 
 	if err != nil {
@@ -72,10 +76,15 @@ func (s Service) PatchUserIdBooksBookId(c *gin.Context, book api.PostBook, userI
 
 // PatchUserIdHoarderBookId implements handler.ServiceInterface.
 func (s Service) PatchUserIdHoarderBookId(c *gin.Context, book api.PostHoarder, userId int, bookId int) (api.HoarderBook, error) {
+	statusId, err := ConvertStautstoId(*book.Status)
+	if err != nil {
+		return api.HoarderBook{}, err
+	}
+
 	result, err := s.repo.PatchUserIdHoarderBookId(c, HoarderRecord{
 		UserId:   userId,
 		BookId:   bookId,
-		StatusId: int(*book.StatusId),
+		StatusId: statusId,
 	})
 	if err != nil {
 		return api.HoarderBook{}, err
@@ -85,12 +94,17 @@ func (s Service) PatchUserIdHoarderBookId(c *gin.Context, book api.PostHoarder, 
 
 // PostUserIdHoarder implements handler.ServiceInterface.
 func (s Service) PostUserIdHoarder(c *gin.Context, book api.PostHoarder, userId int) (api.HoarderBook, error) {
+	statusId, err := ConvertStautstoId(*book.Status)
+	if err != nil {
+		return api.HoarderBook{}, err
+	}
+
 	result, err := s.repo.PostUserIdHoarder(c, BookRecord{
 		//Id: unused
-		Title:  *book.BookInfo.Title,
+		Title:  *book.Title,
 		UserId: int64(userId),
-		TagIds: *book.BookInfo.TagIds,
-	}, int(*book.StatusId))
+		TagIds: *book.TagIds,
+	}, statusId)
 	if err != nil {
 		return api.HoarderBook{}, err
 	}
@@ -99,12 +113,17 @@ func (s Service) PostUserIdHoarder(c *gin.Context, book api.PostHoarder, userId 
 
 // PostUserIdHoarderBookId implements handler.ServiceInterface.
 func (s Service) PostUserIdHoarderBookId(c *gin.Context, book api.PostHoarder, userId int, bookId int) (api.HoarderBook, error) {
+	statusId, err := ConvertStautstoId(*book.Status)
+	if err != nil {
+		return api.HoarderBook{}, err
+	}
+
 	result, err := s.repo.PostUserIdHoarderBookId(c, BookRecord{
 		Id:     int64(bookId),
-		Title:  *book.BookInfo.Title,
-		TagIds: *book.BookInfo.TagIds,
+		Title:  *book.Title,
+		TagIds: *book.TagIds,
 		UserId: int64(userId),
-	}, int(*book.StatusId))
+	}, statusId)
 	if err != nil {
 		return api.HoarderBook{}, err
 	}
