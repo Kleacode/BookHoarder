@@ -1,4 +1,4 @@
-import { StatusType } from "@/libs/schemas/schemaHealper";
+import type { StatusType } from "@/libs/schemas/schemaHealper";
 
 export const ConvertStatusTypeToLabel = (type:StatusType) => {
     switch (type) {

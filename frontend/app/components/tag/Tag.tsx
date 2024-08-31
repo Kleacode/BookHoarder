@@ -17,7 +17,8 @@ export const Tag = ({
             <span className="truncate">{label}</span>
             {onClick && <button
                 className="rounded-full w-5 h-5 hover:bg-gray-100 hover:bg-opacity-50 flex items-center justify-center"
-                onClick={onClick}>x</button>}
+                onClick={onClick}
+                type="button">x</button>}
         </span>
     )
 }

@@ -8,6 +8,7 @@ describe("isObject", () => {
         expect(ConvertStatusTypeToLabel("done")).toBe("読了");
     })
     it("ng", () => {
+        // biome-ignore lint: ng test case 
         assert.throws(() => ConvertStatusTypeToLabel("aaaaaa" as any), "invalid status type");
     })
 });
