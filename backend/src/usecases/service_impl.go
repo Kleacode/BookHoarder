@@ -129,3 +129,37 @@ func (s Service) PostUserIdHoarderBookId(c *gin.Context, book api.PostHoarder, u
 	}
 	return result, nil
 }
+
+// DeleteUserIdTagsTagId implements handler.ServiceInterface.
+func (s Service) DeleteUserIdTagsTagId(c *gin.Context, userId int, tagId int) error {
+	err := s.repo.DeleteUserIdTagsTagId(c, userId, tagId)
+	return err
+}
+
+// GetTags implements handler.ServiceInterface.
+func (s Service) GetTags(c *gin.Context, params api.GetTagsParams) ([]api.ExistTag, error) {
+	tags, err := s.repo.GetTags(c, params)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []api.ExistTag
+	for _, e := range tags {
+		result = append(result, e.ToExistTag())
+	}
+	return result, nil
+}
+
+// PostUserIdTags implements handler.ServiceInterface.
+func (s Service) PostUserIdTags(c *gin.Context, userId int, taginfo api.TagInfo) (api.ExistTag, error) {
+	tag, err := s.repo.PostUserIdTags(c, TagRecord{
+		// Id: unused,
+		Name:   *taginfo.Name,
+		UserId: int64(userId),
+	})
+	if err != nil {
+		return api.ExistTag{}, err
+	}
+
+	return tag, nil
+}

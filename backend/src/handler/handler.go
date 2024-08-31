@@ -20,6 +20,10 @@ type ServiceInterface interface {
 
 	DeleteUserIdBooksBookId(c *gin.Context, userId int, bookId int) error
 	DeleteUserIdHoarderBookId(c *gin.Context, userId int, bookId int) error
+
+	DeleteUserIdTagsTagId(c *gin.Context, userId int, tagId int) error
+	GetTags(c *gin.Context, params api.GetTagsParams) ([]api.ExistTag, error)
+	PostUserIdTags(c *gin.Context, userId int, taginfo api.TagInfo) (api.ExistTag, error)
 }
 
 type Handler struct {

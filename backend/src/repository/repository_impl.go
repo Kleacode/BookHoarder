@@ -128,3 +128,42 @@ func (r Repository) PostUserIdHoarderBookId(c context.Context, data usecases.Boo
 
 	return data.ToHoarderBook(int64(statusId))
 }
+
+// DeleteUserIdTagsTagId implements usecases.RepositoryInterface.
+func (r Repository) DeleteUserIdTagsTagId(c context.Context, userId int, tagId int) error {
+	result, err := r.db.Exec("DELETE FROM tags WHERE id = $1 AND user_id = $2", tagId, userId)
+	if err != nil {
+		return err
+	}
+	row, _ := result.RowsAffected()
+	if row == 0 {
+		return domain.ErrorNotFound
+	}
+	return nil
+}
+
+// GetTags implements usecases.RepositoryInterface.
+func (r Repository) GetTags(c context.Context, params api.GetTagsParams) ([]usecases.TagRecord, error) {
+	var tags []usecases.TagRecord
+	err := r.db.Select(&tags, "SELECT * FROM tags")
+	if err != nil {
+		return nil, err
+	}
+	return tags, err
+}
+
+// PostUserIdTags implements usecases.RepositoryInterface.
+func (r Repository) PostUserIdTags(c context.Context, data usecases.TagRecord) (api.ExistTag, error) {
+	var createdId int
+	err := r.db.Get(&createdId, "INSERT INTO tags (user_id, name) VALUES ($1, $2) RETURNING id", data.UserId, data.Name)
+	if err != nil {
+		return api.ExistTag{}, err
+	}
+
+	if createdId == 0 {
+		return api.ExistTag{}, domain.ErrorFailedInsert
+	}
+
+	data.Id = int64(createdId)
+	return data.ToExistTag(), nil
+}

@@ -67,6 +67,20 @@ func (r *UserHoarderRecord) ToHoarderBook() (api.HoarderBook, error) {
 	}, nil
 }
 
+type TagRecord struct {
+	Id     int64  `db:"id"`
+	Name   string `db:"name"`
+	UserId int64  `db:"user_id"`
+}
+
+func (r *TagRecord) ToExistTag() api.ExistTag {
+	return api.ExistTag{
+		TagId:  &r.Id,
+		Name:   &r.Name,
+		UserId: &r.UserId,
+	}
+}
+
 func ConvertStautstoId(s api.Status) (int, error) {
 	switch s {
 	case api.Todo:

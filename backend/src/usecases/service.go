@@ -20,6 +20,10 @@ type RepositoryInterface interface {
 
 	DeleteUserIdBooksBookId(c context.Context, userId int, bookId int) error
 	DeleteUserIdHoarderBookId(c context.Context, userId int, bookId int) error
+
+	DeleteUserIdTagsTagId(c context.Context, userId int, tagId int) error
+	GetTags(c context.Context, params api.GetTagsParams) ([]TagRecord, error)
+	PostUserIdTags(c context.Context, data TagRecord) (api.ExistTag, error)
 }
 
 type Service struct {

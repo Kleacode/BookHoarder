@@ -124,3 +124,39 @@ func (h *Handler) PostUserIdHoarderBookId(c *gin.Context, userId int, bookId int
 
 	c.JSON(http.StatusCreated, post)
 }
+
+// DeleteUserIdTagsTagId implements api.ServerInterface.
+func (h *Handler) DeleteUserIdTagsTagId(c *gin.Context, userId int, tagId int) {
+	err := h.service.DeleteUserIdTagsTagId(c, userId, tagId)
+	if err != nil {
+		c.JSON(domain.GetStatusCode(err), err.Error())
+		return
+	}
+	c.JSON(http.StatusNoContent, nil)
+}
+
+// GetTags implements api.ServerInterface.
+func (h *Handler) GetTags(c *gin.Context, params api.GetTagsParams) {
+	tags, err := h.service.GetTags(c, params)
+	if err != nil {
+		c.JSON(domain.GetStatusCode(err), err.Error())
+		return
+	}
+	c.JSON(http.StatusOK, tags)
+}
+
+// PostUserIdTags implements api.ServerInterface.
+func (h *Handler) PostUserIdTags(c *gin.Context, userId int) {
+	var taginfo api.TagInfo
+	if err := c.BindJSON(&taginfo); err != nil {
+		return
+	}
+
+	tag, err := h.service.PostUserIdTags(c, userId, taginfo)
+	if err != nil {
+		c.JSON(domain.GetStatusCode(err), err.Error())
+		return
+	}
+
+	c.JSON(http.StatusCreated, tag)
+}
