@@ -10,6 +10,8 @@ get:
       content:
         'application/json':
           schema:
-            $ref: "../components/schemas/books.yaml#/books"
+            type: array
+            items:
+              $ref: "../components/schemas/books.yaml#/exist_book"
     default:
       $ref: "../components/responses/default_response.yaml"

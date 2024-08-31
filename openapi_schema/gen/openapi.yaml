@@ -21,7 +21,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/books'
+                type: array
+                items:
+                  $ref: '#/components/schemas/exist_book'
         default:
           $ref: '#/components/responses/default_response'
   /books/{bookId}:
@@ -35,7 +37,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/book'
+                $ref: '#/components/schemas/exist_book'
         default:
           $ref: '#/components/responses/default_response'
   /{userId}/books/{bookId}:
@@ -48,14 +50,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/book'
+              $ref: '#/components/schemas/post_book'
       responses:
         '200':
           description: 更新成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/book'
+                $ref: '#/components/schemas/exist_book'
         default:
           $ref: '#/components/responses/default_response'
     delete:
@@ -83,15 +85,17 @@ paths:
             type: array
             items:
               type: integer
-            style: form
-            explode: false
+          explode: false
+          style: form
       responses:
         '200':
           description: 本の一覧
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/books'
+                type: array
+                items:
+                  $ref: '#/components/schemas/hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
     post:
@@ -102,14 +106,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/book'
+              $ref: '#/components/schemas/post_hoarder'
       responses:
         '201':
           description: 登録成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/book'
+                $ref: '#/components/schemas/hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
   /{userId}/hoarder/{bookId}:
@@ -122,14 +126,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/book'
+              $ref: '#/components/schemas/post_hoarder'
       responses:
         '201':
           description: 登録成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/book'
+                $ref: '#/components/schemas/hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
     patch:
@@ -141,14 +145,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/book'
+              $ref: '#/components/schemas/post_hoarder'
       responses:
         '200':
           description: 更新成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/book'
+                $ref: '#/components/schemas/hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
     delete:
@@ -174,15 +178,9 @@ components:
           format: int32
         message:
           type: string
-    book:
+    book_info:
       type: object
-      required:
-        - bookId
-        - title
       properties:
-        bookId:
-          type: integer
-          format: int64
         title:
           type: string
         tagIds:
@@ -190,10 +188,41 @@ components:
           items:
             type: integer
             format: int64
-    books:
-      type: array
-      items:
-        $ref: '#/components/schemas/book'
+    new_book:
+      allOf:
+        - $ref: '#/components/schemas/book_info'
+        - properties:
+            userId:
+              type: integer
+              format: int64
+    exist_book:
+      allOf:
+        - $ref: '#/components/schemas/new_book'
+        - properties:
+            bookId:
+              type: integer
+              format: int64
+    post_book:
+      allOf:
+        - $ref: '#/components/schemas/book_info'
+    status:
+      type: string
+      enum:
+        - todo
+        - wip
+        - done
+    hoarder_book:
+      allOf:
+        - $ref: '#/components/schemas/exist_book'
+        - properties:
+            status:
+              $ref: '#/components/schemas/status'
+    post_hoarder:
+      allOf:
+        - $ref: '#/components/schemas/book_info'
+        - properties:
+            status:
+              $ref: '#/components/schemas/status'
   responses:
     default_response:
       description: unexpected error

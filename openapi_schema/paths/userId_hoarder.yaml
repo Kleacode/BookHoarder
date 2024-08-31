@@ -20,7 +20,9 @@ get:
       content:
         'application/json':
           schema:
-            $ref: "../components/schemas/books.yaml#/books"
+            type: array
+            items:
+              $ref: "../components/schemas/books.yaml#/hoarder_book"
     default:
       $ref: "../components/responses/default_response.yaml"
 
@@ -32,7 +34,7 @@ post:
     content:
       'application/json':
         schema:
-          $ref: "../components/schemas/books.yaml#/book"
+          $ref: "../components/schemas/books.yaml#/post_hoarder"
   
   responses:
     "201":
@@ -40,6 +42,6 @@ post:
       content:
         'application/json':
           schema:
-            $ref: "../components/schemas/books.yaml#/book"
+            $ref: "../components/schemas/books.yaml#/hoarder_book"
     default:
       $ref: "../components/responses/default_response.yaml"

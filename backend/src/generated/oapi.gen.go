@@ -11,21 +11,61 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
-// Book defines model for book.
-type Book struct {
-	BookId int64    `json:"bookId"`
-	TagIds *[]int64 `json:"tagIds,omitempty"`
-	Title  string   `json:"title"`
-}
+// Defines values for Status.
+const (
+	Done Status = "done"
+	Todo Status = "todo"
+	Wip  Status = "wip"
+)
 
-// Books defines model for books.
-type Books = []Book
+// BookInfo defines model for book_info.
+type BookInfo struct {
+	TagIds *[]int64 `json:"tagIds,omitempty"`
+	Title  *string  `json:"title,omitempty"`
+}
 
 // Error defines model for error.
 type Error struct {
 	Code    int32  `json:"code"`
 	Message string `json:"message"`
 }
+
+// ExistBook defines model for exist_book.
+type ExistBook struct {
+	BookId *int64   `json:"bookId,omitempty"`
+	TagIds *[]int64 `json:"tagIds,omitempty"`
+	Title  *string  `json:"title,omitempty"`
+	UserId *int64   `json:"userId,omitempty"`
+}
+
+// HoarderBook defines model for hoarder_book.
+type HoarderBook struct {
+	BookId *int64   `json:"bookId,omitempty"`
+	Status *Status  `json:"status,omitempty"`
+	TagIds *[]int64 `json:"tagIds,omitempty"`
+	Title  *string  `json:"title,omitempty"`
+	UserId *int64   `json:"userId,omitempty"`
+}
+
+// NewBook defines model for new_book.
+type NewBook struct {
+	TagIds *[]int64 `json:"tagIds,omitempty"`
+	Title  *string  `json:"title,omitempty"`
+	UserId *int64   `json:"userId,omitempty"`
+}
+
+// PostBook defines model for post_book.
+type PostBook = BookInfo
+
+// PostHoarder defines model for post_hoarder.
+type PostHoarder struct {
+	Status *Status  `json:"status,omitempty"`
+	TagIds *[]int64 `json:"tagIds,omitempty"`
+	Title  *string  `json:"title,omitempty"`
+}
+
+// Status defines model for status.
+type Status string
 
 // BookId defines model for bookId.
 type BookId = int
@@ -48,16 +88,16 @@ type GetUserIdHoarderParams struct {
 }
 
 // PatchUserIdBooksBookIdJSONRequestBody defines body for PatchUserIdBooksBookId for application/json ContentType.
-type PatchUserIdBooksBookIdJSONRequestBody = Book
+type PatchUserIdBooksBookIdJSONRequestBody = PostBook
 
 // PostUserIdHoarderJSONRequestBody defines body for PostUserIdHoarder for application/json ContentType.
-type PostUserIdHoarderJSONRequestBody = Book
+type PostUserIdHoarderJSONRequestBody = PostHoarder
 
 // PatchUserIdHoarderBookIdJSONRequestBody defines body for PatchUserIdHoarderBookId for application/json ContentType.
-type PatchUserIdHoarderBookIdJSONRequestBody = Book
+type PatchUserIdHoarderBookIdJSONRequestBody = PostHoarder
 
 // PostUserIdHoarderBookIdJSONRequestBody defines body for PostUserIdHoarderBookId for application/json ContentType.
-type PostUserIdHoarderBookIdJSONRequestBody = Book
+type PostUserIdHoarderBookIdJSONRequestBody = PostHoarder
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -242,7 +282,7 @@ func (siw *ServerInterfaceWrapper) GetUserIdHoarder(c *gin.Context) {
 
 	// ------------- Optional query parameter "tags" -------------
 
-	err = runtime.BindQueryParameter("form", true, false, "tags", c.Request.URL.Query(), &params.Tags)
+	err = runtime.BindQueryParameter("form", false, false, "tags", c.Request.URL.Query(), &params.Tags)
 	if err != nil {
 		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter tags: %w", err), http.StatusBadRequest)
 		return

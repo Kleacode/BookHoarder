@@ -1,10 +1,17 @@
 package main
 
 import (
+	api "back/src/generated"
+	"back/src/handler"
+	"back/src/repository"
+	"back/src/usecases"
 	"fmt"
 	"log"
 	"os"
+	"time"
 
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
@@ -27,12 +34,20 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	ty := []User{}
-	err2 := db.Select(&ty, "SELECT * FROM users")
-	if err2 != nil {
-		log.Fatalln(err2)
-	}
-	for _, name := range ty {
-		fmt.Println(name)
-	}
+	r := gin.Default()
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:8001"},
+		AllowMethods:     []string{"GET", "DELETE", "PUT", "PATCH", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+	repo := repository.NewRepository(db)
+	service := usecases.NewService(repo)
+	handler := handler.NewHandler(service)
+
+	api.RegisterHandlers(r, handler)
+
+	r.Run()
 }
