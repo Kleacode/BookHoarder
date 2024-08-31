@@ -3,14 +3,14 @@ tag_info:
   properties:
     name:
       type: string
-    userId:
-      type: integer
-      format: int64
 
 exist_tag:
   allOf:
     - $ref: "#/tag_info"
     - properties:
         tagId:
+          type: integer
+          format: int64
+        userId:
           type: integer
           format: int64

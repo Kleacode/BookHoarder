@@ -369,7 +369,11 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["tag_info"];
+                };
+            };
             responses: {
                 /** @description 登録成功 */
                 201: {
@@ -450,12 +454,12 @@ export interface components {
         };
         tag_info: {
             name?: string;
-            /** Format: int64 */
-            userId?: number;
         };
         exist_tag: components["schemas"]["tag_info"] & {
             /** Format: int64 */
             tagId?: number;
+            /** Format: int64 */
+            userId?: number;
         };
         post_book: components["schemas"]["book_info"];
         /** @enum {string} */

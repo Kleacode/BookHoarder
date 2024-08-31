@@ -189,11 +189,11 @@ paths:
       summary: タグを新しく登録する
       parameters:
         - $ref: '#/components/parameters/userId'
-      equestBody:
+      requestBody:
         content:
           application/json:
             schema:
-              $ref: ../components/schemas/tags.yaml#/tag_info
+              $ref: '#/components/schemas/tag_info'
       responses:
         '201':
           description: 登録成功
@@ -256,14 +256,14 @@ components:
       properties:
         name:
           type: string
-        userId:
-          type: integer
-          format: int64
     exist_tag:
       allOf:
         - $ref: '#/components/schemas/tag_info'
         - properties:
             tagId:
+              type: integer
+              format: int64
+            userId:
               type: integer
               format: int64
     post_book:

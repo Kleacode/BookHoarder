@@ -2,7 +2,7 @@ post:
   summary: タグを新しく登録する
   parameters:
     - $ref: "../components/parameters/userId.yaml"
-  equestBody:
+  requestBody:
     content:
       'application/json':
         schema:

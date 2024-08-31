@@ -76,8 +76,7 @@ type Status string
 
 // TagInfo defines model for tag_info.
 type TagInfo struct {
-	Name   *string `json:"name,omitempty"`
-	UserId *int64  `json:"userId,omitempty"`
+	Name *string `json:"name,omitempty"`
 }
 
 // BookId defines model for bookId.
@@ -119,6 +118,9 @@ type PatchUserIdHoarderBookIdJSONRequestBody = PostHoarder
 
 // PostUserIdHoarderBookIdJSONRequestBody defines body for PostUserIdHoarderBookId for application/json ContentType.
 type PostUserIdHoarderBookIdJSONRequestBody = PostHoarder
+
+// PostUserIdTagsJSONRequestBody defines body for PostUserIdTags for application/json ContentType.
+type PostUserIdTagsJSONRequestBody = TagInfo
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
