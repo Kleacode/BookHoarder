@@ -38,6 +38,13 @@ type ExistBook struct {
 	UserId *int64   `json:"userId,omitempty"`
 }
 
+// ExistTag defines model for exist_tag.
+type ExistTag struct {
+	Name   *string `json:"name,omitempty"`
+	TagId  *int64  `json:"tagId,omitempty"`
+	UserId *int64  `json:"userId,omitempty"`
+}
+
 // HoarderBook defines model for hoarder_book.
 type HoarderBook struct {
 	BookId *int64   `json:"bookId,omitempty"`
@@ -67,8 +74,17 @@ type PostHoarder struct {
 // Status defines model for status.
 type Status string
 
+// TagInfo defines model for tag_info.
+type TagInfo struct {
+	Name   *string `json:"name,omitempty"`
+	UserId *int64  `json:"userId,omitempty"`
+}
+
 // BookId defines model for bookId.
 type BookId = int
+
+// TagId defines model for tagId.
+type TagId = int
 
 // UserId defines model for userId.
 type UserId = int
@@ -79,6 +95,11 @@ type DefaultResponse = Error
 // GetBooksParams defines parameters for GetBooks.
 type GetBooksParams struct {
 	Title *string `form:"title,omitempty" json:"title,omitempty"`
+}
+
+// GetTagsParams defines parameters for GetTags.
+type GetTagsParams struct {
+	Name *string `form:"name,omitempty" json:"name,omitempty"`
 }
 
 // GetUserIdHoarderParams defines parameters for GetUserIdHoarder.
@@ -107,6 +128,9 @@ type ServerInterface interface {
 	// 特定の本1冊の情報を取得する
 	// (GET /books/{bookId})
 	GetBooksBookId(c *gin.Context, bookId BookId)
+	// 登録されているタグを取得する
+	// (GET /tags)
+	GetTags(c *gin.Context, params GetTagsParams)
 	// ユーザーが登録した本を削除する
 	// (DELETE /{userId}/books/{bookId})
 	DeleteUserIdBooksBookId(c *gin.Context, userId UserId, bookId BookId)
@@ -128,6 +152,12 @@ type ServerInterface interface {
 	// ユーザーの積読リストに本を登録する
 	// (POST /{userId}/hoarder/{bookId})
 	PostUserIdHoarderBookId(c *gin.Context, userId UserId, bookId BookId)
+	// タグを新しく登録する
+	// (POST /{userId}/tags)
+	PostUserIdTags(c *gin.Context, userId UserId)
+	// タグを削除する
+	// (DELETE /{userId}/tags/{tagId})
+	DeleteUserIdTagsTagId(c *gin.Context, userId UserId, tagId TagId)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -187,6 +217,32 @@ func (siw *ServerInterfaceWrapper) GetBooksBookId(c *gin.Context) {
 	}
 
 	siw.Handler.GetBooksBookId(c, bookId)
+}
+
+// GetTags operation middleware
+func (siw *ServerInterfaceWrapper) GetTags(c *gin.Context) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetTagsParams
+
+	// ------------- Optional query parameter "name" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "name", c.Request.URL.Query(), &params.Name)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter name: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetTags(c, params)
 }
 
 // DeleteUserIdBooksBookId operation middleware
@@ -421,6 +477,63 @@ func (siw *ServerInterfaceWrapper) PostUserIdHoarderBookId(c *gin.Context) {
 	siw.Handler.PostUserIdHoarderBookId(c, userId, bookId)
 }
 
+// PostUserIdTags operation middleware
+func (siw *ServerInterfaceWrapper) PostUserIdTags(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "userId" -------------
+	var userId UserId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.PostUserIdTags(c, userId)
+}
+
+// DeleteUserIdTagsTagId operation middleware
+func (siw *ServerInterfaceWrapper) DeleteUserIdTagsTagId(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "userId" -------------
+	var userId UserId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// ------------- Path parameter "tagId" -------------
+	var tagId TagId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "tagId", c.Param("tagId"), &tagId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter tagId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.DeleteUserIdTagsTagId(c, userId, tagId)
+}
+
 // GinServerOptions provides options for the Gin server.
 type GinServerOptions struct {
 	BaseURL      string
@@ -450,6 +563,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/books", wrapper.GetBooks)
 	router.GET(options.BaseURL+"/books/:bookId", wrapper.GetBooksBookId)
+	router.GET(options.BaseURL+"/tags", wrapper.GetTags)
 	router.DELETE(options.BaseURL+"/:userId/books/:bookId", wrapper.DeleteUserIdBooksBookId)
 	router.PATCH(options.BaseURL+"/:userId/books/:bookId", wrapper.PatchUserIdBooksBookId)
 	router.GET(options.BaseURL+"/:userId/hoarder", wrapper.GetUserIdHoarder)
@@ -457,4 +571,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.DELETE(options.BaseURL+"/:userId/hoarder/:bookId", wrapper.DeleteUserIdHoarderBookId)
 	router.PATCH(options.BaseURL+"/:userId/hoarder/:bookId", wrapper.PatchUserIdHoarderBookId)
 	router.POST(options.BaseURL+"/:userId/hoarder/:bookId", wrapper.PostUserIdHoarderBookId)
+	router.POST(options.BaseURL+"/:userId/tags", wrapper.PostUserIdTags)
+	router.DELETE(options.BaseURL+"/:userId/tags/:tagId", wrapper.DeleteUserIdTagsTagId)
 }

@@ -3,6 +3,9 @@ tag_info:
   properties:
     name:
       type: string
+    userId:
+      type: integer
+      format: int64
 
 exist_tag:
   allOf:

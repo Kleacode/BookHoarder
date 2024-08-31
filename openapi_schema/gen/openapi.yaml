@@ -26,6 +26,25 @@ paths:
                   $ref: '#/components/schemas/exist_book'
         default:
           $ref: '#/components/responses/default_response'
+  /tags:
+    get:
+      summary: 登録されているタグを取得する
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: タグの一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/exist_tag'
+        default:
+          $ref: '#/components/responses/default_response'
   /books/{bookId}:
     get:
       summary: 特定の本1冊の情報を取得する
@@ -165,6 +184,36 @@ paths:
           description: 削除成功
         default:
           $ref: '#/components/responses/default_response'
+  /{userId}/tags:
+    post:
+      summary: タグを新しく登録する
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      equestBody:
+        content:
+          application/json:
+            schema:
+              $ref: ../components/schemas/tags.yaml#/tag_info
+      responses:
+        '201':
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/exist_tag'
+        default:
+          $ref: '#/components/responses/default_response'
+  /{userId}/tags/{tagId}:
+    delete:
+      summary: タグを削除する
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/tagId'
+      responses:
+        '204':
+          description: 削除成功
+        default:
+          $ref: '#/components/responses/default_response'
 components:
   schemas:
     error:
@@ -200,6 +249,21 @@ components:
         - $ref: '#/components/schemas/new_book'
         - properties:
             bookId:
+              type: integer
+              format: int64
+    tag_info:
+      type: object
+      properties:
+        name:
+          type: string
+        userId:
+          type: integer
+          format: int64
+    exist_tag:
+      allOf:
+        - $ref: '#/components/schemas/tag_info'
+        - properties:
+            tagId:
               type: integer
               format: int64
     post_book:
@@ -239,6 +303,12 @@ components:
         type: integer
     userId:
       name: userId
+      in: path
+      required: true
+      schema:
+        type: integer
+    tagId:
+      name: tagId
       in: path
       required: true
       schema:
