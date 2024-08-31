@@ -11,6 +11,8 @@ servers:
 paths:
   /books:
     $ref: "./paths/books.yaml"
+  /tags:
+    $ref: "./paths/tags.yaml"
   /books/{bookId}:
     $ref: "./paths/books_bookId.yaml"    
   /{userId}/books/{bookId}:
@@ -19,3 +21,7 @@ paths:
     $ref: "./paths/userId_hoarder.yaml" 
   /{userId}/hoarder/{bookId}:
     $ref: "./paths/userId_hoarder_bookId.yaml"
+  /{userId}/tags:
+    $ref: "./paths/userId_tags.yaml"
+  /{userId}/tags/{tagId}:
+    $ref: "./paths/userId_tags_tagId.yaml"

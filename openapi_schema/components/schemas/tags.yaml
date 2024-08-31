@@ -1,0 +1,13 @@
+tag_info:
+  type: object
+  properties:
+    name:
+      type: string
+
+exist_tag:
+  allOf:
+    - $ref: "#/tag_info"
+    - properties:
+        tagId:
+          type: integer
+          format: int64

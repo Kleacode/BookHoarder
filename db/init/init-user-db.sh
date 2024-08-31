@@ -32,11 +32,12 @@ psql -v ON_ERROR_STOP=1 --username ${POSTGRES_USER} --dbname ${POSTGRES_DB} <<-E
 	CREATE TABLE tags(
 	  id        SERIAL PRIMARY KEY,
 
-	  name      VARCHAR(50)
+	  name      VARCHAR(50),
+	  user_id	INT REFERENCES users(id) NOT NULL
 	);
-	INSERT INTO tags (name) VALUES ('tag1');
-	INSERT INTO tags (name) VALUES ('tag2');
-	INSERT INTO tags (name) VALUES ('tag3');
+	INSERT INTO tags (name, user_id) VALUES ('tag1', 1);
+	INSERT INTO tags (name, user_id) VALUES ('tag2', 1);
+	INSERT INTO tags (name, user_id) VALUES ('tag3', 1);
 
 	CREATE TABLE user_book_status(
 	  id        SERIAL PRIMARY KEY,

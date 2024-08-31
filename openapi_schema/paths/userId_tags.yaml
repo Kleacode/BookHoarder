@@ -1,0 +1,18 @@
+post:
+  summary: タグを新しく登録する
+  parameters:
+    - $ref: "../components/parameters/userId.yaml"
+  equestBody:
+    content:
+      'application/json':
+        schema:
+          $ref: "../components/schemas/tags.yaml#/tag_info"
+  responses:
+    "201":
+      description: 登録成功
+      content:
+        'application/json':
+          schema:
+            $ref: "../components/schemas/tags.yaml#/exist_tag"
+    default:
+      $ref: "../components/responses/default_response.yaml"

@@ -1,0 +1,17 @@
+get:
+  summary: 登録されているタグを取得する
+  parameters:
+    - name: name
+      in: query
+      schema: {type: string}
+  responses:
+    "200":
+      description: タグの一覧
+      content:
+        'application/json':
+          schema:
+            type: array
+            items:
+              $ref: "../components/schemas/tags.yaml#/exist_tag"
+    default:
+      $ref: "../components/responses/default_response.yaml"
