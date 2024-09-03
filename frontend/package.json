@@ -85,8 +85,6 @@
 		"pnpm": "9.7.0"
 	},
 	"eslintConfig": {
-		"extends": [
-			"plugin:storybook/recommended"
-		]
+		"extends": ["plugin:storybook/recommended"]
 	}
 }

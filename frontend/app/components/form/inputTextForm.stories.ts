@@ -18,13 +18,13 @@ type Story = StoryObj<typeof meta>;
 
 export const Example1: Story = {
 	args: {
-		label: "title"
+		label: "title",
 	},
 };
 
 export const Example2: Story = {
 	args: {
 		label: "placeholder",
-        placeholder: "placeholder"
+		placeholder: "placeholder",
 	},
 };

@@ -29,27 +29,27 @@ export const Example1: Story = {
 export const Example2: Story = {
 	args: {
 		label: "あいうえお",
-		backgroundColor: "#800080"
+		backgroundColor: "#800080",
 	},
 };
 
 export const Example3: Story = {
 	args: {
 		label: "あいうえおかきくけこさしすせそ",
-		backgroundColor: "#000080"
+		backgroundColor: "#000080",
 	},
 };
 
 export const Example4: Story = {
 	args: {
 		label: "AAAAA",
-		onClick: (e)=>{}
+		onClick: (e) => {},
 	},
 };
 
 export const Example5: Story = {
 	args: {
 		label: "あいうえおかきくけこさしすせそ",
-		onClick: (e)=>{}
+		onClick: (e) => {},
 	},
 };

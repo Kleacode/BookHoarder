@@ -1,14 +1,14 @@
-import type { Targets } from "./types";
-import Path from "node:path";
 import fs from "node:fs";
+import Path from "node:path";
 import _ from "lodash";
+import type { Targets } from "./types";
 import {
-	getFilenameWithoutExtension,
 	buildIndexTs,
-	hasExportsFile,
 	generateIndexFileName,
-	isDir,
+	getFilenameWithoutExtension,
 	hasExportDefaultFile,
+	hasExportsFile,
+	isDir,
 } from "./utils";
 
 export default function generateIndex(targets: Targets) {

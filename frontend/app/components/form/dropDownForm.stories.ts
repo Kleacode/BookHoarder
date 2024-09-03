@@ -19,13 +19,17 @@ type Story = StoryObj<typeof meta>;
 export const Example1: Story = {
 	args: {
 		label: "title",
-        options: ["a","b","c"]
+		options: ["a", "b", "c"],
 	},
 };
 
 export const Example2: Story = {
 	args: {
 		label: "title",
-        options: ["あいうえおかきくけこさしすせそたちつてと","かきくけこさしすせそたちつてとあいうえお","さしすせそたちつてとあいうえおかきくけこ"]
+		options: [
+			"あいうえおかきくけこさしすせそたちつてと",
+			"かきくけこさしすせそたちつてとあいうえお",
+			"さしすせそたちつてとあいうえおかきくけこ",
+		],
 	},
 };
