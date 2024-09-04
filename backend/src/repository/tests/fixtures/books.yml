@@ -1,0 +1,14 @@
+- id: 1
+  title: "book_title"
+  user_id: 1
+  tags_id: NULL
+
+- id: 2
+  title: "初期登録本"
+  user_id: 2
+  tags_id: NULL
+
+- id: 3
+  title: "book"
+  user_id: 2
+  tags_id: "{1,2}"
