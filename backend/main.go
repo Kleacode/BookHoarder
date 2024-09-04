@@ -24,7 +24,7 @@ type User struct {
 func main() {
 	password := os.Getenv("POSTGRES_PASSWORD")
 	username := os.Getenv("POSTGRES_USER")
-	dbname := os.Getenv("POSTGRES_DB")
+	dbname := os.Getenv("POSTGRES_DEV_DB")
 	hostname := os.Getenv("HOST_NAME")
 
 	dataSource := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", hostname, username, password, dbname)
