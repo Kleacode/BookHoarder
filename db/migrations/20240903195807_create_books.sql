@@ -4,8 +4,7 @@ CREATE TABLE books(
     id        SERIAL PRIMARY KEY,
 
     title     VARCHAR(100),
-    user_id	INT REFERENCES users(id) NOT NULL,
-    tags_id	INT[]
+    user_id	INT REFERENCES users(id) NOT NULL
 );
 -- +goose StatementEnd
 
