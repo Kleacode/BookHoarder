@@ -1,0 +1,15 @@
+output   = "./src/generated/models"
+wipe     = true
+no-tests = true
+add-enum-types = true
+tag = ["db"]
+
+[psql]
+  dbname = "develop"
+  host   = "db"
+  port   = 5432
+  user   = "user"
+  pass   = "password"
+  schema = "public"
+  sslmode = "disable"
+  blacklist = ["migrations"]
