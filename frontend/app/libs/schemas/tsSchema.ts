@@ -442,33 +442,35 @@ export interface components {
         };
         book_info: {
             title?: string;
-            tagIds?: number[];
         };
         new_book: components["schemas"]["book_info"] & {
-            /** Format: int64 */
             userId?: number;
         };
         exist_book: components["schemas"]["new_book"] & {
-            /** Format: int64 */
             bookId?: number;
         };
         tag_info: {
             name?: string;
         };
         exist_tag: components["schemas"]["tag_info"] & {
-            /** Format: int64 */
             tagId?: number;
-            /** Format: int64 */
             userId?: number;
         };
         post_book: components["schemas"]["book_info"];
         /** @enum {string} */
         status: "todo" | "wip" | "done";
+        tag: {
+            id?: number;
+            name?: string;
+        };
+        tags: components["schemas"]["tag"][];
         hoarder_book: components["schemas"]["exist_book"] & {
             status?: components["schemas"]["status"];
+            tags?: components["schemas"]["tags"];
         };
         post_hoarder: components["schemas"]["book_info"] & {
             status?: components["schemas"]["status"];
+            tags?: components["schemas"]["tags"];
         };
     };
     responses: {

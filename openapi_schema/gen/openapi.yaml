@@ -232,25 +232,18 @@ components:
       properties:
         title:
           type: string
-        tagIds:
-          type: array
-          items:
-            type: integer
-            format: int64
     new_book:
       allOf:
         - $ref: '#/components/schemas/book_info'
         - properties:
             userId:
               type: integer
-              format: int64
     exist_book:
       allOf:
         - $ref: '#/components/schemas/new_book'
         - properties:
             bookId:
               type: integer
-              format: int64
     tag_info:
       type: object
       properties:
@@ -262,10 +255,8 @@ components:
         - properties:
             tagId:
               type: integer
-              format: int64
             userId:
               type: integer
-              format: int64
     post_book:
       allOf:
         - $ref: '#/components/schemas/book_info'
@@ -275,18 +266,33 @@ components:
         - todo
         - wip
         - done
+    tag:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    tags:
+      type: array
+      items:
+        $ref: '#/components/schemas/tag'
     hoarder_book:
       allOf:
         - $ref: '#/components/schemas/exist_book'
         - properties:
             status:
               $ref: '#/components/schemas/status'
+            tags:
+              $ref: '#/components/schemas/tags'
     post_hoarder:
       allOf:
         - $ref: '#/components/schemas/book_info'
         - properties:
             status:
               $ref: '#/components/schemas/status'
+            tags:
+              $ref: '#/components/schemas/tags'
   responses:
     default_response:
       description: unexpected error

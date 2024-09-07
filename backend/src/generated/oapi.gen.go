@@ -20,8 +20,7 @@ const (
 
 // BookInfo defines model for book_info.
 type BookInfo struct {
-	TagIds *[]int64 `json:"tagIds,omitempty"`
-	Title  *string  `json:"title,omitempty"`
+	Title *string `json:"title,omitempty"`
 }
 
 // Error defines model for error.
@@ -32,33 +31,31 @@ type Error struct {
 
 // ExistBook defines model for exist_book.
 type ExistBook struct {
-	BookId *int64   `json:"bookId,omitempty"`
-	TagIds *[]int64 `json:"tagIds,omitempty"`
-	Title  *string  `json:"title,omitempty"`
-	UserId *int64   `json:"userId,omitempty"`
+	BookId *int    `json:"bookId,omitempty"`
+	Title  *string `json:"title,omitempty"`
+	UserId *int    `json:"userId,omitempty"`
 }
 
 // ExistTag defines model for exist_tag.
 type ExistTag struct {
 	Name   *string `json:"name,omitempty"`
-	TagId  *int64  `json:"tagId,omitempty"`
-	UserId *int64  `json:"userId,omitempty"`
+	TagId  *int    `json:"tagId,omitempty"`
+	UserId *int    `json:"userId,omitempty"`
 }
 
 // HoarderBook defines model for hoarder_book.
 type HoarderBook struct {
-	BookId *int64   `json:"bookId,omitempty"`
-	Status *Status  `json:"status,omitempty"`
-	TagIds *[]int64 `json:"tagIds,omitempty"`
-	Title  *string  `json:"title,omitempty"`
-	UserId *int64   `json:"userId,omitempty"`
+	BookId *int    `json:"bookId,omitempty"`
+	Status *Status `json:"status,omitempty"`
+	Tags   *Tags   `json:"tags,omitempty"`
+	Title  *string `json:"title,omitempty"`
+	UserId *int    `json:"userId,omitempty"`
 }
 
 // NewBook defines model for new_book.
 type NewBook struct {
-	TagIds *[]int64 `json:"tagIds,omitempty"`
-	Title  *string  `json:"title,omitempty"`
-	UserId *int64   `json:"userId,omitempty"`
+	Title  *string `json:"title,omitempty"`
+	UserId *int    `json:"userId,omitempty"`
 }
 
 // PostBook defines model for post_book.
@@ -66,18 +63,27 @@ type PostBook = BookInfo
 
 // PostHoarder defines model for post_hoarder.
 type PostHoarder struct {
-	Status *Status  `json:"status,omitempty"`
-	TagIds *[]int64 `json:"tagIds,omitempty"`
-	Title  *string  `json:"title,omitempty"`
+	Status *Status `json:"status,omitempty"`
+	Tags   *Tags   `json:"tags,omitempty"`
+	Title  *string `json:"title,omitempty"`
 }
 
 // Status defines model for status.
 type Status string
 
+// Tag defines model for tag.
+type Tag struct {
+	Id   *int    `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+}
+
 // TagInfo defines model for tag_info.
 type TagInfo struct {
 	Name *string `json:"name,omitempty"`
 }
+
+// Tags defines model for tags.
+type Tags = []Tag
 
 // BookId defines model for bookId.
 type BookId = int

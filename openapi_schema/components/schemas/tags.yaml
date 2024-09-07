@@ -10,7 +10,5 @@ exist_tag:
     - properties:
         tagId:
           type: integer
-          format: int64
         userId:
           type: integer
-          format: int64
