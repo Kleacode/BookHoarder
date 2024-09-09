@@ -1,0 +1,30 @@
+patch:
+  summary: ユーザーの積読リストにある積読の状態を更新する
+  parameters:
+    - $ref: "../components/parameters/userId.yaml"
+    - $ref: "../components/parameters/hoarderId.yaml"
+  requestBody:
+    content:
+      'application/json':
+        schema: 
+          $ref: "../components/schemas/books.yaml#/patch_hoarder"
+  responses:
+    "200":
+      description: 更新成功
+      content:
+        'application/json':
+          schema:
+            $ref: "../components/schemas/books.yaml#/hoarder_book"
+    default:
+      $ref: "../components/responses/default_response.yaml"
+
+delete:
+  summary: ユーザーの積読リストにある積読を削除する
+  parameters:
+    - $ref: "../components/parameters/userId.yaml"
+    - $ref: "../components/parameters/hoarderId.yaml"
+  responses:
+    "204":
+      description: 削除成功
+    default:
+      $ref: "../components/responses/default_response.yaml"

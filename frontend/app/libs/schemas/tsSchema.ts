@@ -194,7 +194,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** ユーザーの積読リストから、本の一覧を取得する。 */
+        /** ユーザーの積読リストから、積読の一覧を取得する。 */
         get: {
             parameters: {
                 query?: {
@@ -222,7 +222,7 @@ export interface paths {
             };
         };
         put?: never;
-        /** 本を新しく登録する。そのままユーザーの積読リストにも登録する。 */
+        /** 本を新しく登録する。その本をユーザーの積読リストに積読として登録する。 */
         post: {
             parameters: {
                 query?: never;
@@ -234,7 +234,7 @@ export interface paths {
             };
             requestBody?: {
                 content: {
-                    "application/json": components["schemas"]["post_hoarder"];
+                    "application/json": components["schemas"]["post_hoarder_new"];
                 };
             };
             responses: {
@@ -265,7 +265,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** ユーザーの積読リストに本を登録する */
+        /** ユーザーの積読リストに既に登録済みの本から積読を登録する */
         post: {
             parameters: {
                 query?: never;
@@ -278,7 +278,7 @@ export interface paths {
             };
             requestBody?: {
                 content: {
-                    "application/json": components["schemas"]["post_hoarder"];
+                    "application/json": components["schemas"]["post_hoarder_exist"];
                 };
             };
             responses: {
@@ -294,14 +294,30 @@ export interface paths {
                 default: components["responses"]["default_response"];
             };
         };
-        /** ユーザーの積読リストにある本を削除する */
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/{userId}/hoarder/{hoarderId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** ユーザーの積読リストにある積読を削除する */
         delete: {
             parameters: {
                 query?: never;
                 header?: never;
                 path: {
                     userId: components["parameters"]["userId"];
-                    bookId: components["parameters"]["bookId"];
+                    hoarderId: components["parameters"]["hoarderId"];
                 };
                 cookie?: never;
             };
@@ -319,20 +335,20 @@ export interface paths {
         };
         options?: never;
         head?: never;
-        /** ユーザーの積読リストにある本の状態を更新する */
+        /** ユーザーの積読リストにある積読の状態を更新する */
         patch: {
             parameters: {
                 query?: never;
                 header?: never;
                 path: {
                     userId: components["parameters"]["userId"];
-                    bookId: components["parameters"]["bookId"];
+                    hoarderId: components["parameters"]["hoarderId"];
                 };
                 cookie?: never;
             };
             requestBody?: {
                 content: {
-                    "application/json": components["schemas"]["post_hoarder"];
+                    "application/json": components["schemas"]["patch_hoarder"];
                 };
             };
             responses: {
@@ -440,10 +456,10 @@ export interface components {
             code: number;
             message: string;
         };
-        book_info: {
+        book: {
             title?: string;
         };
-        new_book: components["schemas"]["book_info"] & {
+        new_book: components["schemas"]["book"] & {
             userId?: number;
         };
         exist_book: components["schemas"]["new_book"] & {
@@ -456,7 +472,7 @@ export interface components {
             tagId?: number;
             userId?: number;
         };
-        post_book: components["schemas"]["book_info"];
+        post_book: components["schemas"]["book"];
         /** @enum {string} */
         status: "todo" | "wip" | "done";
         tag: {
@@ -464,11 +480,21 @@ export interface components {
             name?: string;
         };
         tags: components["schemas"]["tag"][];
-        hoarder_book: components["schemas"]["exist_book"] & {
+        hoarder_book: {
+            book?: components["schemas"]["exist_book"];
             status?: components["schemas"]["status"];
             tags?: components["schemas"]["tags"];
         };
-        post_hoarder: components["schemas"]["book_info"] & {
+        post_hoarder_new: {
+            book?: components["schemas"]["book"];
+            status?: components["schemas"]["status"];
+            tags?: components["schemas"]["tags"];
+        };
+        post_hoarder_exist: {
+            status?: components["schemas"]["status"];
+            tags?: components["schemas"]["tags"];
+        };
+        patch_hoarder: {
             status?: components["schemas"]["status"];
             tags?: components["schemas"]["tags"];
         };
@@ -487,6 +513,7 @@ export interface components {
     parameters: {
         bookId: number;
         userId: number;
+        hoarderId: number;
         tagId: number;
     };
     requestBodies: never;

@@ -1,9 +1,3 @@
-book_info:
-  type: object
-  properties:
-    title:
-      type: string
-
 components:
   schemas:
     status:
@@ -12,6 +6,7 @@ components:
         - "todo"
         - "wip"
         - "done"
+
     tag:
       type: object
       properties:
@@ -19,16 +14,21 @@ components:
           type: integer
         name:
           type: string
+
     tags:
       type: array
       items:
         $ref: "#/components/schemas/tag"
 
-    
+    book:
+      type: object
+      properties:
+        title:
+          type: string
 
 new_book:
   allOf:
-    - $ref: "#/book_info"
+    - $ref: "#/components/schemas/book"
     - properties:
         userId:
           type: integer
@@ -41,21 +41,40 @@ exist_book:
           type: integer
 
 hoarder_book:
+  type: object
+  properties:
+    book:
+      $ref: "#/exist_book"
+    status:
+      $ref: "#/components/schemas/status"
+    tags:
+      $ref: "#/components/schemas/tags"
+        
+post_book:
   allOf:
-    - $ref: "#/exist_book"
+    - $ref: "#/components/schemas/book"
+
+post_hoarder_new:
+  allOf:
+    - properties:
+        book:
+          $ref: "#/components/schemas/book"
+        status:
+          $ref: "#/components/schemas/status"
+        tags:
+          $ref: "#/components/schemas/tags"
+
+post_hoarder_exist:
+  allOf:
     - properties:
         status:
           $ref: "#/components/schemas/status"
         tags:
           $ref: "#/components/schemas/tags"
-        
-post_book:
-  allOf:
-    - $ref: "#/book_info"
 
-post_hoarder:
+
+patch_hoarder:
   allOf:
-    - $ref: "#/book_info"
     - properties:
         status:
           $ref: "#/components/schemas/status"

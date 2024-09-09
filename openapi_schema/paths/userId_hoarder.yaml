@@ -1,5 +1,5 @@
 get:
-  summary: ユーザーの積読リストから、本の一覧を取得する。
+  summary: ユーザーの積読リストから、積読の一覧を取得する。
   parameters:
     - $ref: "../components/parameters/userId.yaml"
     - name: status
@@ -27,14 +27,14 @@ get:
       $ref: "../components/responses/default_response.yaml"
 
 post:
-  summary: 本を新しく登録する。そのままユーザーの積読リストにも登録する。
+  summary: 本を新しく登録する。その本をユーザーの積読リストに積読として登録する。
   parameters:
     - $ref: "../components/parameters/userId.yaml"
   requestBody:
     content:
       'application/json':
         schema:
-          $ref: "../components/schemas/books.yaml#/post_hoarder"
+          $ref: "../components/schemas/books.yaml#/post_hoarder_new"
   
   responses:
     "201":

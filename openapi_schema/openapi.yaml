@@ -21,6 +21,8 @@ paths:
     $ref: "./paths/userId_hoarder.yaml" 
   /{userId}/hoarder/{bookId}:
     $ref: "./paths/userId_hoarder_bookId.yaml"
+  /{userId}/hoarder/{hoarderId}:
+    $ref: "./paths/userId_hoarder_hoarderId.yaml"
   /{userId}/tags:
     $ref: "./paths/userId_tags.yaml"
   /{userId}/tags/{tagId}:

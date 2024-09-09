@@ -1,0 +1,4 @@
+name: hoarderId
+in: path
+required: true
+schema: {type: integer}

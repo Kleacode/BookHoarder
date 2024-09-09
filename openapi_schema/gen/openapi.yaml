@@ -91,7 +91,7 @@ paths:
           $ref: '#/components/responses/default_response'
   /{userId}/hoarder:
     get:
-      summary: ユーザーの積読リストから、本の一覧を取得する。
+      summary: ユーザーの積読リストから、積読の一覧を取得する。
       parameters:
         - $ref: '#/components/parameters/userId'
         - name: status
@@ -118,14 +118,14 @@ paths:
         default:
           $ref: '#/components/responses/default_response'
     post:
-      summary: 本を新しく登録する。そのままユーザーの積読リストにも登録する。
+      summary: 本を新しく登録する。その本をユーザーの積読リストに積読として登録する。
       parameters:
         - $ref: '#/components/parameters/userId'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/post_hoarder'
+              $ref: '#/components/schemas/post_hoarder_new'
       responses:
         '201':
           description: 登録成功
@@ -137,7 +137,7 @@ paths:
           $ref: '#/components/responses/default_response'
   /{userId}/hoarder/{bookId}:
     post:
-      summary: ユーザーの積読リストに本を登録する
+      summary: ユーザーの積読リストに既に登録済みの本から積読を登録する
       parameters:
         - $ref: '#/components/parameters/userId'
         - $ref: '#/components/parameters/bookId'
@@ -145,7 +145,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/post_hoarder'
+              $ref: '#/components/schemas/post_hoarder_exist'
       responses:
         '201':
           description: 登録成功
@@ -155,16 +155,17 @@ paths:
                 $ref: '#/components/schemas/hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
+  /{userId}/hoarder/{hoarderId}:
     patch:
-      summary: ユーザーの積読リストにある本の状態を更新する
+      summary: ユーザーの積読リストにある積読の状態を更新する
       parameters:
         - $ref: '#/components/parameters/userId'
-        - $ref: '#/components/parameters/bookId'
+        - $ref: '#/components/parameters/hoarderId'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/post_hoarder'
+              $ref: '#/components/schemas/patch_hoarder'
       responses:
         '200':
           description: 更新成功
@@ -175,10 +176,10 @@ paths:
         default:
           $ref: '#/components/responses/default_response'
     delete:
-      summary: ユーザーの積読リストにある本を削除する
+      summary: ユーザーの積読リストにある積読を削除する
       parameters:
         - $ref: '#/components/parameters/userId'
-        - $ref: '#/components/parameters/bookId'
+        - $ref: '#/components/parameters/hoarderId'
       responses:
         '204':
           description: 削除成功
@@ -227,14 +228,14 @@ components:
           format: int32
         message:
           type: string
-    book_info:
+    book:
       type: object
       properties:
         title:
           type: string
     new_book:
       allOf:
-        - $ref: '#/components/schemas/book_info'
+        - $ref: '#/components/schemas/book'
         - properties:
             userId:
               type: integer
@@ -259,7 +260,7 @@ components:
               type: integer
     post_book:
       allOf:
-        - $ref: '#/components/schemas/book_info'
+        - $ref: '#/components/schemas/book'
     status:
       type: string
       enum:
@@ -278,16 +279,32 @@ components:
       items:
         $ref: '#/components/schemas/tag'
     hoarder_book:
+      type: object
+      properties:
+        book:
+          $ref: '#/components/schemas/exist_book'
+        status:
+          $ref: '#/components/schemas/status'
+        tags:
+          $ref: '#/components/schemas/tags'
+    post_hoarder_new:
       allOf:
-        - $ref: '#/components/schemas/exist_book'
+        - properties:
+            book:
+              $ref: '#/components/schemas/book'
+            status:
+              $ref: '#/components/schemas/status'
+            tags:
+              $ref: '#/components/schemas/tags'
+    post_hoarder_exist:
+      allOf:
         - properties:
             status:
               $ref: '#/components/schemas/status'
             tags:
               $ref: '#/components/schemas/tags'
-    post_hoarder:
+    patch_hoarder:
       allOf:
-        - $ref: '#/components/schemas/book_info'
         - properties:
             status:
               $ref: '#/components/schemas/status'
@@ -309,6 +326,12 @@ components:
         type: integer
     userId:
       name: userId
+      in: path
+      required: true
+      schema:
+        type: integer
+    hoarderId:
+      name: hoarderId
       in: path
       required: true
       schema:
