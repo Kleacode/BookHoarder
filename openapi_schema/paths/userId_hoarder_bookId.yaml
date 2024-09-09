@@ -14,6 +14,6 @@ post:
       content:
         'application/json':
           schema:
-            $ref: "../components/schemas/books.yaml#/hoarder_book"
+            $ref: "../components/schemas/books.yaml#/exist_hoarder_book"
     default:
       $ref: "../components/responses/default_response.yaml"

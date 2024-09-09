@@ -49,7 +49,14 @@ hoarder_book:
       $ref: "#/components/schemas/status"
     tags:
       $ref: "#/components/schemas/tags"
-        
+
+exist_hoarder_book:
+  allOf:
+    - properties:
+        hoarderId:
+          type: integer
+    - $ref: "#/hoarder_book"
+
 post_book:
   allOf:
     - $ref: "#/components/schemas/book"

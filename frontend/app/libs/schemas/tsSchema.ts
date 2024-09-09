@@ -215,7 +215,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["hoarder_book"][];
+                        "application/json": components["schemas"]["exist_hoarder_book"][];
                     };
                 };
                 default: components["responses"]["default_response"];
@@ -244,7 +244,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["hoarder_book"];
+                        "application/json": components["schemas"]["exist_hoarder_book"];
                     };
                 };
                 default: components["responses"]["default_response"];
@@ -288,7 +288,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["hoarder_book"];
+                        "application/json": components["schemas"]["exist_hoarder_book"];
                     };
                 };
                 default: components["responses"]["default_response"];
@@ -358,7 +358,7 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": components["schemas"]["hoarder_book"];
+                        "application/json": components["schemas"]["exist_hoarder_book"];
                     };
                 };
                 default: components["responses"]["default_response"];
@@ -485,6 +485,9 @@ export interface components {
             status?: components["schemas"]["status"];
             tags?: components["schemas"]["tags"];
         };
+        exist_hoarder_book: {
+            hoarderId?: number;
+        } & components["schemas"]["hoarder_book"];
         post_hoarder_new: {
             book?: components["schemas"]["book"];
             status?: components["schemas"]["status"];

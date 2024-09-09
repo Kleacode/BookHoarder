@@ -114,7 +114,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/hoarder_book'
+                  $ref: '#/components/schemas/exist_hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
     post:
@@ -132,7 +132,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/hoarder_book'
+                $ref: '#/components/schemas/exist_hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
   /{userId}/hoarder/{bookId}:
@@ -152,7 +152,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/hoarder_book'
+                $ref: '#/components/schemas/exist_hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
   /{userId}/hoarder/{hoarderId}:
@@ -172,7 +172,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/hoarder_book'
+                $ref: '#/components/schemas/exist_hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
     delete:
@@ -287,6 +287,12 @@ components:
           $ref: '#/components/schemas/status'
         tags:
           $ref: '#/components/schemas/tags'
+    exist_hoarder_book:
+      allOf:
+        - properties:
+            hoarderId:
+              type: integer
+        - $ref: '#/components/schemas/hoarder_book'
     post_hoarder_new:
       allOf:
         - properties:

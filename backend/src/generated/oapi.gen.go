@@ -36,6 +36,14 @@ type ExistBook struct {
 	UserId *int    `json:"userId,omitempty"`
 }
 
+// ExistHoarderBook defines model for exist_hoarder_book.
+type ExistHoarderBook struct {
+	Book      *ExistBook `json:"book,omitempty"`
+	HoarderId *int       `json:"hoarderId,omitempty"`
+	Status    *Status    `json:"status,omitempty"`
+	Tags      *Tags      `json:"tags,omitempty"`
+}
+
 // ExistTag defines model for exist_tag.
 type ExistTag struct {
 	Name   *string `json:"name,omitempty"`
