@@ -66,17 +66,17 @@ var TagWhere = struct {
 
 // TagRels is where relationship names are stored.
 var TagRels = struct {
-	User     string
-	BookTags string
+	User        string
+	HoarderTags string
 }{
-	User:     "User",
-	BookTags: "BookTags",
+	User:        "User",
+	HoarderTags: "HoarderTags",
 }
 
 // tagR is where relationships are stored.
 type tagR struct {
-	User     *User        `db:"User" boil:"User" json:"User" toml:"User" yaml:"User"`
-	BookTags BookTagSlice `db:"BookTags" boil:"BookTags" json:"BookTags" toml:"BookTags" yaml:"BookTags"`
+	User        *User           `db:"User" boil:"User" json:"User" toml:"User" yaml:"User"`
+	HoarderTags HoarderTagSlice `db:"HoarderTags" boil:"HoarderTags" json:"HoarderTags" toml:"HoarderTags" yaml:"HoarderTags"`
 }
 
 // NewStruct creates a new relationship struct
@@ -91,11 +91,11 @@ func (r *tagR) GetUser() *User {
 	return r.User
 }
 
-func (r *tagR) GetBookTags() BookTagSlice {
+func (r *tagR) GetHoarderTags() HoarderTagSlice {
 	if r == nil {
 		return nil
 	}
-	return r.BookTags
+	return r.HoarderTags
 }
 
 // tagL is where Load methods for each relationship are stored.
@@ -425,18 +425,18 @@ func (o *Tag) User(mods ...qm.QueryMod) userQuery {
 	return Users(queryMods...)
 }
 
-// BookTags retrieves all the book_tag's BookTags with an executor.
-func (o *Tag) BookTags(mods ...qm.QueryMod) bookTagQuery {
+// HoarderTags retrieves all the hoarder_tag's HoarderTags with an executor.
+func (o *Tag) HoarderTags(mods ...qm.QueryMod) hoarderTagQuery {
 	var queryMods []qm.QueryMod
 	if len(mods) != 0 {
 		queryMods = append(queryMods, mods...)
 	}
 
 	queryMods = append(queryMods,
-		qm.Where("\"book_tag\".\"tag_id\"=?", o.ID),
+		qm.Where("\"hoarder_tag\".\"tag_id\"=?", o.ID),
 	)
 
-	return BookTags(queryMods...)
+	return HoarderTags(queryMods...)
 }
 
 // LoadUser allows an eager lookup of values, cached into the
@@ -559,9 +559,9 @@ func (tagL) LoadUser(ctx context.Context, e boil.ContextExecutor, singular bool,
 	return nil
 }
 
-// LoadBookTags allows an eager lookup of values, cached into the
+// LoadHoarderTags allows an eager lookup of values, cached into the
 // loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (tagL) LoadBookTags(ctx context.Context, e boil.ContextExecutor, singular bool, maybeTag interface{}, mods queries.Applicator) error {
+func (tagL) LoadHoarderTags(ctx context.Context, e boil.ContextExecutor, singular bool, maybeTag interface{}, mods queries.Applicator) error {
 	var slice []*Tag
 	var object *Tag
 
@@ -614,8 +614,8 @@ func (tagL) LoadBookTags(ctx context.Context, e boil.ContextExecutor, singular b
 	}
 
 	query := NewQuery(
-		qm.From(`book_tag`),
-		qm.WhereIn(`book_tag.tag_id in ?`, argsSlice...),
+		qm.From(`hoarder_tag`),
+		qm.WhereIn(`hoarder_tag.tag_id in ?`, argsSlice...),
 	)
 	if mods != nil {
 		mods.Apply(query)
@@ -623,22 +623,22 @@ func (tagL) LoadBookTags(ctx context.Context, e boil.ContextExecutor, singular b
 
 	results, err := query.QueryContext(ctx, e)
 	if err != nil {
-		return errors.Wrap(err, "failed to eager load book_tag")
+		return errors.Wrap(err, "failed to eager load hoarder_tag")
 	}
 
-	var resultSlice []*BookTag
+	var resultSlice []*HoarderTag
 	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice book_tag")
+		return errors.Wrap(err, "failed to bind eager loaded slice hoarder_tag")
 	}
 
 	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on book_tag")
+		return errors.Wrap(err, "failed to close results in eager load on hoarder_tag")
 	}
 	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for book_tag")
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for hoarder_tag")
 	}
 
-	if len(bookTagAfterSelectHooks) != 0 {
+	if len(hoarderTagAfterSelectHooks) != 0 {
 		for _, obj := range resultSlice {
 			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
 				return err
@@ -646,10 +646,10 @@ func (tagL) LoadBookTags(ctx context.Context, e boil.ContextExecutor, singular b
 		}
 	}
 	if singular {
-		object.R.BookTags = resultSlice
+		object.R.HoarderTags = resultSlice
 		for _, foreign := range resultSlice {
 			if foreign.R == nil {
-				foreign.R = &bookTagR{}
+				foreign.R = &hoarderTagR{}
 			}
 			foreign.R.Tag = object
 		}
@@ -659,9 +659,9 @@ func (tagL) LoadBookTags(ctx context.Context, e boil.ContextExecutor, singular b
 	for _, foreign := range resultSlice {
 		for _, local := range slice {
 			if local.ID == foreign.TagID {
-				local.R.BookTags = append(local.R.BookTags, foreign)
+				local.R.HoarderTags = append(local.R.HoarderTags, foreign)
 				if foreign.R == nil {
-					foreign.R = &bookTagR{}
+					foreign.R = &hoarderTagR{}
 				}
 				foreign.R.Tag = local
 				break
@@ -719,11 +719,11 @@ func (o *Tag) SetUser(ctx context.Context, exec boil.ContextExecutor, insert boo
 	return nil
 }
 
-// AddBookTags adds the given related objects to the existing relationships
+// AddHoarderTags adds the given related objects to the existing relationships
 // of the tag, optionally inserting them as new records.
-// Appends related to o.R.BookTags.
+// Appends related to o.R.HoarderTags.
 // Sets related.R.Tag appropriately.
-func (o *Tag) AddBookTags(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*BookTag) error {
+func (o *Tag) AddHoarderTags(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*HoarderTag) error {
 	var err error
 	for _, rel := range related {
 		if insert {
@@ -733,9 +733,9 @@ func (o *Tag) AddBookTags(ctx context.Context, exec boil.ContextExecutor, insert
 			}
 		} else {
 			updateQuery := fmt.Sprintf(
-				"UPDATE \"book_tag\" SET %s WHERE %s",
+				"UPDATE \"hoarder_tag\" SET %s WHERE %s",
 				strmangle.SetParamNames("\"", "\"", 1, []string{"tag_id"}),
-				strmangle.WhereClause("\"", "\"", 2, bookTagPrimaryKeyColumns),
+				strmangle.WhereClause("\"", "\"", 2, hoarderTagPrimaryKeyColumns),
 			)
 			values := []interface{}{o.ID, rel.ID}
 
@@ -754,15 +754,15 @@ func (o *Tag) AddBookTags(ctx context.Context, exec boil.ContextExecutor, insert
 
 	if o.R == nil {
 		o.R = &tagR{
-			BookTags: related,
+			HoarderTags: related,
 		}
 	} else {
-		o.R.BookTags = append(o.R.BookTags, related...)
+		o.R.HoarderTags = append(o.R.HoarderTags, related...)
 	}
 
 	for _, rel := range related {
 		if rel.R == nil {
-			rel.R = &bookTagR{
+			rel.R = &hoarderTagR{
 				Tag: o,
 			}
 		} else {

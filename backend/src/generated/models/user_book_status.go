@@ -72,20 +72,23 @@ var UserBookStatusWhere = struct {
 
 // UserBookStatusRels is where relationship names are stored.
 var UserBookStatusRels = struct {
-	Book   string
-	Status string
-	User   string
+	Book               string
+	Status             string
+	User               string
+	HoarderHoarderTags string
 }{
-	Book:   "Book",
-	Status: "Status",
-	User:   "User",
+	Book:               "Book",
+	Status:             "Status",
+	User:               "User",
+	HoarderHoarderTags: "HoarderHoarderTags",
 }
 
 // userBookStatusR is where relationships are stored.
 type userBookStatusR struct {
-	Book   *Book   `db:"Book" boil:"Book" json:"Book" toml:"Book" yaml:"Book"`
-	Status *Status `db:"Status" boil:"Status" json:"Status" toml:"Status" yaml:"Status"`
-	User   *User   `db:"User" boil:"User" json:"User" toml:"User" yaml:"User"`
+	Book               *Book           `db:"Book" boil:"Book" json:"Book" toml:"Book" yaml:"Book"`
+	Status             *Status         `db:"Status" boil:"Status" json:"Status" toml:"Status" yaml:"Status"`
+	User               *User           `db:"User" boil:"User" json:"User" toml:"User" yaml:"User"`
+	HoarderHoarderTags HoarderTagSlice `db:"HoarderHoarderTags" boil:"HoarderHoarderTags" json:"HoarderHoarderTags" toml:"HoarderHoarderTags" yaml:"HoarderHoarderTags"`
 }
 
 // NewStruct creates a new relationship struct
@@ -112,6 +115,13 @@ func (r *userBookStatusR) GetUser() *User {
 		return nil
 	}
 	return r.User
+}
+
+func (r *userBookStatusR) GetHoarderHoarderTags() HoarderTagSlice {
+	if r == nil {
+		return nil
+	}
+	return r.HoarderHoarderTags
 }
 
 // userBookStatusL is where Load methods for each relationship are stored.
@@ -461,6 +471,20 @@ func (o *UserBookStatus) User(mods ...qm.QueryMod) userQuery {
 	queryMods = append(queryMods, mods...)
 
 	return Users(queryMods...)
+}
+
+// HoarderHoarderTags retrieves all the hoarder_tag's HoarderTags with an executor via hoarder_id column.
+func (o *UserBookStatus) HoarderHoarderTags(mods ...qm.QueryMod) hoarderTagQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"hoarder_tag\".\"hoarder_id\"=?", o.ID),
+	)
+
+	return HoarderTags(queryMods...)
 }
 
 // LoadBook allows an eager lookup of values, cached into the
@@ -823,6 +847,119 @@ func (userBookStatusL) LoadUser(ctx context.Context, e boil.ContextExecutor, sin
 	return nil
 }
 
+// LoadHoarderHoarderTags allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (userBookStatusL) LoadHoarderHoarderTags(ctx context.Context, e boil.ContextExecutor, singular bool, maybeUserBookStatus interface{}, mods queries.Applicator) error {
+	var slice []*UserBookStatus
+	var object *UserBookStatus
+
+	if singular {
+		var ok bool
+		object, ok = maybeUserBookStatus.(*UserBookStatus)
+		if !ok {
+			object = new(UserBookStatus)
+			ok = queries.SetFromEmbeddedStruct(&object, &maybeUserBookStatus)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", object, maybeUserBookStatus))
+			}
+		}
+	} else {
+		s, ok := maybeUserBookStatus.(*[]*UserBookStatus)
+		if ok {
+			slice = *s
+		} else {
+			ok = queries.SetFromEmbeddedStruct(&slice, maybeUserBookStatus)
+			if !ok {
+				return errors.New(fmt.Sprintf("failed to set %T from embedded struct %T", slice, maybeUserBookStatus))
+			}
+		}
+	}
+
+	args := make(map[interface{}]struct{})
+	if singular {
+		if object.R == nil {
+			object.R = &userBookStatusR{}
+		}
+		args[object.ID] = struct{}{}
+	} else {
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &userBookStatusR{}
+			}
+			args[obj.ID] = struct{}{}
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	argsSlice := make([]interface{}, len(args))
+	i := 0
+	for arg := range args {
+		argsSlice[i] = arg
+		i++
+	}
+
+	query := NewQuery(
+		qm.From(`hoarder_tag`),
+		qm.WhereIn(`hoarder_tag.hoarder_id in ?`, argsSlice...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load hoarder_tag")
+	}
+
+	var resultSlice []*HoarderTag
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice hoarder_tag")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on hoarder_tag")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for hoarder_tag")
+	}
+
+	if len(hoarderTagAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.HoarderHoarderTags = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &hoarderTagR{}
+			}
+			foreign.R.Hoarder = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.HoarderID {
+				local.R.HoarderHoarderTags = append(local.R.HoarderHoarderTags, foreign)
+				if foreign.R == nil {
+					foreign.R = &hoarderTagR{}
+				}
+				foreign.R.Hoarder = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // SetBook of the userBookStatus to the related item.
 // Sets o.R.Book to related.
 // Adds o to related.R.UserBookStatuses.
@@ -961,6 +1098,59 @@ func (o *UserBookStatus) SetUser(ctx context.Context, exec boil.ContextExecutor,
 		related.R.UserBookStatuses = append(related.R.UserBookStatuses, o)
 	}
 
+	return nil
+}
+
+// AddHoarderHoarderTags adds the given related objects to the existing relationships
+// of the user_book_status, optionally inserting them as new records.
+// Appends related to o.R.HoarderHoarderTags.
+// Sets related.R.Hoarder appropriately.
+func (o *UserBookStatus) AddHoarderHoarderTags(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*HoarderTag) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.HoarderID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"hoarder_tag\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"hoarder_id"}),
+				strmangle.WhereClause("\"", "\"", 2, hoarderTagPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.HoarderID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &userBookStatusR{
+			HoarderHoarderTags: related,
+		}
+	} else {
+		o.R.HoarderHoarderTags = append(o.R.HoarderHoarderTags, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &hoarderTagR{
+				Hoarder: o,
+			}
+		} else {
+			rel.R.Hoarder = o
+		}
+	}
 	return nil
 }
 

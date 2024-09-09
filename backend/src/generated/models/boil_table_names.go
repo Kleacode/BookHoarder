@@ -4,17 +4,17 @@
 package models
 
 var TableNames = struct {
-	BookTag        string
 	Books          string
 	GooseDBVersion string
+	HoarderTag     string
 	Status         string
 	Tags           string
 	UserBookStatus string
 	Users          string
 }{
-	BookTag:        "book_tag",
 	Books:          "books",
 	GooseDBVersion: "goose_db_version",
+	HoarderTag:     "hoarder_tag",
 	Status:         "status",
 	Tags:           "tags",
 	UserBookStatus: "user_book_status",
