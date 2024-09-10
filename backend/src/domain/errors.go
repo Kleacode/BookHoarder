@@ -1,22 +1,31 @@
 package domain
 
 import (
+	api "back/src/generated"
 	"errors"
 	"net/http"
 )
 
 var (
-	ErrorNotFound     = errors.New("not found resource")
-	ErrorFailedInsert = errors.New("failed insert")
+	ErrNoAffected = errors.New("no affected")
+
+	ErrInternal = errors.New("error")
 )
 
-func GetStatusCode(err error) int {
+func getErrorCode(err error) int {
 	switch err {
-	case ErrorNotFound:
-		return http.StatusNotFound
-	case ErrorFailedInsert:
-		return http.StatusInternalServerError
+	default:
+		return 0
+	}
+}
+
+func getStatusCode(err error) int {
+	switch err {
 	default:
 		return http.StatusInternalServerError
 	}
+}
+
+func GetErrorResponse(err error) (int, api.Error) {
+	return getStatusCode(err), api.Error{Code: int32(getErrorCode(err)), Message: err.Error()}
 }
