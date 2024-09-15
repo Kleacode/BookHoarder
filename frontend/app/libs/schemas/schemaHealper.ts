@@ -1,5 +1,5 @@
-import type { UnionToIntersection, Get } from "type-fest";
-import type { paths } from "./tsSchema";
+import type { Get, UnionToIntersection } from "type-fest";
+import type { components, paths } from "./tsSchema";
 
 export type UrlPaths = keyof paths;
 
@@ -40,3 +40,5 @@ export type PathParameters<
 export type UrlPathsFilteredByMethod<Method extends HttpMethods> = {
 	[K in UrlPaths]: Method extends keyof paths[K] ? K : never;
 }[keyof paths & string];
+
+export type StatusType = components["schemas"]["status"];

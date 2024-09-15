@@ -11,6 +11,8 @@ RUN set -ex \
 
 WORKDIR /app
 
+COPY ./biome.json ./..
+
 COPY ./package.json ./
 RUN pnpm install
 
