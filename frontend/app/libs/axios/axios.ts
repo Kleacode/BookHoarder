@@ -5,8 +5,8 @@ import Axios, {
 } from "axios";
 import _ from "lodash";
 
-import { interceptCsrf } from "./interceptors/csrfInterceptor";
 import type * as SchemaHelper from "@/libs/schemas/schemaHealper";
+import { interceptCsrf } from "./interceptors/csrfInterceptor";
 
 const API_URL = "";
 

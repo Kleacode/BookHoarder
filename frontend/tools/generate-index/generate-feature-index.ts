@@ -1,13 +1,13 @@
-import {
-	getFilenameWithoutExtension,
-	buildIndexTs,
-	isIndexFile,
-	hasExportsFile,
-	generateIndexFileName,
-	isDir,
-} from "./utils";
-import Path from "node:path";
 import fs from "node:fs";
+import Path from "node:path";
+import {
+	buildIndexTs,
+	generateIndexFileName,
+	getFilenameWithoutExtension,
+	hasExportsFile,
+	isDir,
+	isIndexFile,
+} from "./utils";
 
 export default function generateFeatureIndex(
 	target: string,

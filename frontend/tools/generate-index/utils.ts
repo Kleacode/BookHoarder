@@ -1,5 +1,5 @@
-import Path from "node:path";
 import fs from "node:fs";
+import Path from "node:path";
 
 const GENERATE_INDEX_SCRIPT_URL =
 	"https://github.com/diggle-jp/monsoon/tree/main/frontend/scripts/generate-index";
