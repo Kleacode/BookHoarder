@@ -26,25 +26,6 @@ paths:
                   $ref: '#/components/schemas/exist_book'
         default:
           $ref: '#/components/responses/default_response'
-  /tags:
-    get:
-      summary: 登録されているタグを取得する
-      parameters:
-        - name: name
-          in: query
-          schema:
-            type: string
-      responses:
-        '200':
-          description: タグの一覧
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/exist_tag'
-        default:
-          $ref: '#/components/responses/default_response'
   /books/{bookId}:
     get:
       summary: 特定の本1冊の情報を取得する
@@ -186,6 +167,25 @@ paths:
         default:
           $ref: '#/components/responses/default_response'
   /{userId}/tags:
+    get:
+      summary: ユーザーが登録したタグを取得する
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - name: name
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/exist_tag'
+        default:
+          $ref: '#/components/responses/default_response'
     post:
       summary: タグを新しく登録する
       parameters:
@@ -245,19 +245,6 @@ components:
         - properties:
             bookId:
               type: integer
-    tag_info:
-      type: object
-      properties:
-        name:
-          type: string
-    exist_tag:
-      allOf:
-        - $ref: '#/components/schemas/tag_info'
-        - properties:
-            tagId:
-              type: integer
-            userId:
-              type: integer
     post_book:
       allOf:
         - $ref: '#/components/schemas/book'
@@ -316,6 +303,19 @@ components:
               $ref: '#/components/schemas/status'
             tags:
               $ref: '#/components/schemas/tags'
+    tag_info:
+      type: object
+      properties:
+        name:
+          type: string
+    exist_tag:
+      allOf:
+        - $ref: '#/components/schemas/tag_info'
+        - properties:
+            tagId:
+              type: integer
+            userId:
+              type: integer
   responses:
     default_response:
       description: unexpected error

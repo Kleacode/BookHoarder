@@ -123,15 +123,15 @@ type GetBooksParams struct {
 	Title *string `form:"title,omitempty" json:"title,omitempty"`
 }
 
-// GetTagsParams defines parameters for GetTags.
-type GetTagsParams struct {
-	Name *string `form:"name,omitempty" json:"name,omitempty"`
-}
-
 // GetUserIdHoarderParams defines parameters for GetUserIdHoarder.
 type GetUserIdHoarderParams struct {
 	Status *string `form:"status,omitempty" json:"status,omitempty"`
 	Tags   *[]int  `form:"tags,omitempty" json:"tags,omitempty"`
+}
+
+// GetUserIdTagsParams defines parameters for GetUserIdTags.
+type GetUserIdTagsParams struct {
+	Name *string `form:"name,omitempty" json:"name,omitempty"`
 }
 
 // PatchUserIdBooksBookIdJSONRequestBody defines body for PatchUserIdBooksBookId for application/json ContentType.
@@ -157,9 +157,6 @@ type ServerInterface interface {
 	// 特定の本1冊の情報を取得する
 	// (GET /books/{bookId})
 	GetBooksBookId(c *gin.Context, bookId BookId)
-	// 登録されているタグを取得する
-	// (GET /tags)
-	GetTags(c *gin.Context, params GetTagsParams)
 	// ユーザーが登録した本を削除する
 	// (DELETE /{userId}/books/{bookId})
 	DeleteUserIdBooksBookId(c *gin.Context, userId UserId, bookId BookId)
@@ -181,6 +178,9 @@ type ServerInterface interface {
 	// ユーザーの積読リストにある積読の状態を更新する
 	// (PATCH /{userId}/hoarder/{hoarderId})
 	PatchUserIdHoarderHoarderId(c *gin.Context, userId UserId, hoarderId HoarderId)
+	// ユーザーが登録したタグを取得する
+	// (GET /{userId}/tags)
+	GetUserIdTags(c *gin.Context, userId UserId, params GetUserIdTagsParams)
 	// タグを新しく登録する
 	// (POST /{userId}/tags)
 	PostUserIdTags(c *gin.Context, userId UserId)
@@ -246,32 +246,6 @@ func (siw *ServerInterfaceWrapper) GetBooksBookId(c *gin.Context) {
 	}
 
 	siw.Handler.GetBooksBookId(c, bookId)
-}
-
-// GetTags operation middleware
-func (siw *ServerInterfaceWrapper) GetTags(c *gin.Context) {
-
-	var err error
-
-	// Parameter object where we will unmarshal all parameters from the context
-	var params GetTagsParams
-
-	// ------------- Optional query parameter "name" -------------
-
-	err = runtime.BindQueryParameter("form", true, false, "name", c.Request.URL.Query(), &params.Name)
-	if err != nil {
-		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter name: %w", err), http.StatusBadRequest)
-		return
-	}
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		middleware(c)
-		if c.IsAborted() {
-			return
-		}
-	}
-
-	siw.Handler.GetTags(c, params)
 }
 
 // DeleteUserIdBooksBookId operation middleware
@@ -506,6 +480,41 @@ func (siw *ServerInterfaceWrapper) PatchUserIdHoarderHoarderId(c *gin.Context) {
 	siw.Handler.PatchUserIdHoarderHoarderId(c, userId, hoarderId)
 }
 
+// GetUserIdTags operation middleware
+func (siw *ServerInterfaceWrapper) GetUserIdTags(c *gin.Context) {
+
+	var err error
+
+	// ------------- Path parameter "userId" -------------
+	var userId UserId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "userId", c.Param("userId"), &userId, runtime.BindStyledParameterOptions{Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter userId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetUserIdTagsParams
+
+	// ------------- Optional query parameter "name" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "name", c.Request.URL.Query(), &params.Name)
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter name: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetUserIdTags(c, userId, params)
+}
+
 // PostUserIdTags operation middleware
 func (siw *ServerInterfaceWrapper) PostUserIdTags(c *gin.Context) {
 
@@ -592,7 +601,6 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 
 	router.GET(options.BaseURL+"/books", wrapper.GetBooks)
 	router.GET(options.BaseURL+"/books/:bookId", wrapper.GetBooksBookId)
-	router.GET(options.BaseURL+"/tags", wrapper.GetTags)
 	router.DELETE(options.BaseURL+"/:userId/books/:bookId", wrapper.DeleteUserIdBooksBookId)
 	router.PATCH(options.BaseURL+"/:userId/books/:bookId", wrapper.PatchUserIdBooksBookId)
 	router.GET(options.BaseURL+"/:userId/hoarder", wrapper.GetUserIdHoarder)
@@ -600,6 +608,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 	router.POST(options.BaseURL+"/:userId/hoarder/:bookId", wrapper.PostUserIdHoarderBookId)
 	router.DELETE(options.BaseURL+"/:userId/hoarder/:hoarderId", wrapper.DeleteUserIdHoarderHoarderId)
 	router.PATCH(options.BaseURL+"/:userId/hoarder/:hoarderId", wrapper.PatchUserIdHoarderHoarderId)
+	router.GET(options.BaseURL+"/:userId/tags", wrapper.GetUserIdTags)
 	router.POST(options.BaseURL+"/:userId/tags", wrapper.PostUserIdTags)
 	router.DELETE(options.BaseURL+"/:userId/tags/:tagId", wrapper.DeleteUserIdTagsTagId)
 }

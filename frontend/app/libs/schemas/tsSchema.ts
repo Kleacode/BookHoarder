@@ -43,45 +43,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/tags": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** 登録されているタグを取得する */
-        get: {
-            parameters: {
-                query?: {
-                    name?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description タグの一覧 */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "application/json": components["schemas"]["exist_tag"][];
-                    };
-                };
-                default: components["responses"]["default_response"];
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/books/{bookId}": {
         parameters: {
             query?: never;
@@ -373,7 +334,32 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** ユーザーが登録したタグを取得する */
+        get: {
+            parameters: {
+                query?: {
+                    name?: string;
+                };
+                header?: never;
+                path: {
+                    userId: components["parameters"]["userId"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description 成功 */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["exist_tag"][];
+                    };
+                };
+                default: components["responses"]["default_response"];
+            };
+        };
         put?: never;
         /** タグを新しく登録する */
         post: {
@@ -465,13 +451,6 @@ export interface components {
         exist_book: components["schemas"]["new_book"] & {
             bookId?: number;
         };
-        tag_info: {
-            name?: string;
-        };
-        exist_tag: components["schemas"]["tag_info"] & {
-            tagId?: number;
-            userId?: number;
-        };
         post_book: components["schemas"]["book"];
         /** @enum {string} */
         status: "todo" | "wip" | "done";
@@ -500,6 +479,13 @@ export interface components {
         patch_hoarder: {
             status?: components["schemas"]["status"];
             tags?: components["schemas"]["tags"];
+        };
+        tag_info: {
+            name?: string;
+        };
+        exist_tag: components["schemas"]["tag_info"] & {
+            tagId?: number;
+            userId?: number;
         };
     };
     responses: {

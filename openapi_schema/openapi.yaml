@@ -11,8 +11,6 @@ servers:
 paths:
   /books:
     $ref: "./paths/books.yaml"
-  /tags:
-    $ref: "./paths/tags.yaml"
   /books/{bookId}:
     $ref: "./paths/books_bookId.yaml"    
   /{userId}/books/{bookId}:
