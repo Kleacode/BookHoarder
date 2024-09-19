@@ -44,8 +44,8 @@ func (m *MockRepository) GetHoarders(c *gin.Context, userId int, params *api.Get
 	panic("unimplemented")
 }
 
-// GetTags implements RepositoryInterface.
-func (m *MockRepository) GetTags(c *gin.Context, params *api.GetTagsParams) ([]models.Tag, error) {
+// GetUserTags implements RepositoryInterface.
+func (m *MockRepository) GetUserTags(c *gin.Context, userId int, params *api.GetUserIdTagsParams) ([]models.Tag, error) {
 	panic("unimplemented")
 }
 
@@ -61,6 +61,11 @@ func (m *MockRepository) InsertHoarder(c *gin.Context, data *models.UserBookStat
 
 // InsertTag implements RepositoryInterface.
 func (m *MockRepository) InsertTag(c *gin.Context, data *models.Tag) (models.Tag, error) {
+	panic("unimplemented")
+}
+
+// UpdateBook implements RepositoryInterface.
+func (m *MockRepository) UpdateBook(c *gin.Context, data *models.Book) (models.Book, error) {
 	panic("unimplemented")
 }
 

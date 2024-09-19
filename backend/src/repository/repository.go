@@ -5,6 +5,7 @@ import (
 	api "back/src/generated"
 	"back/src/generated/models"
 	"back/src/usecases"
+	"time"
 
 	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/gin-gonic/gin"
@@ -172,7 +173,8 @@ func (r *Repository) GetHoarders(c *gin.Context, userId int, params *api.GetUser
 // PostUserIdTags implements usecases.RepositoryInterface.
 func (r *Repository) InsertTag(c *gin.Context, data *models.Tag) (models.Tag, error) {
 	var createdId int
-	err := r.db.QueryRowxContext(c, `INSERT INTO tags (user_id, name) VALUES ($1, $2) RETURNING id`, &data.UserID, &data.Name.String).Scan(&createdId)
+	err := r.db.QueryRowxContext(c, `INSERT INTO tags (user_id, name, created_at, updated_at) VALUES ($1, $2, $3, $4) RETURNING id`,
+		&data.UserID, &data.Name.String, &data.CreatedAt, &data.UpdatedAt).Scan(&createdId)
 	if err != nil {
 		return models.Tag{}, err
 	}
@@ -186,7 +188,8 @@ func (r *Repository) InsertTag(c *gin.Context, data *models.Tag) (models.Tag, er
 // InsertBook implements usecases.RepositoryInterface.
 func (r *Repository) InsertBook(c *gin.Context, data *models.Book) (models.Book, error) {
 	var createdId int
-	err := r.db.QueryRowxContext(c, `INSERT INTO books (title, user_id) VALUES ($1, $2) RETURNING id`, &data.Title.String, &data.UserID).Scan(&createdId)
+	err := r.db.QueryRowxContext(c, `INSERT INTO books (title, user_id, created_at, updated_at) VALUES ($1, $2, $3, $4) RETURNING id`,
+		&data.Title.String, &data.UserID, &data.CreatedAt, &data.UpdatedAt).Scan(&createdId)
 	if err != nil {
 		return models.Book{}, err
 	}
@@ -198,8 +201,8 @@ func (r *Repository) InsertBook(c *gin.Context, data *models.Book) (models.Book,
 
 func (r *Repository) InsertHoarder(c *gin.Context, data *models.UserBookStatus) (models.UserBookStatus, error) {
 	var createdId int
-	err := r.db.QueryRowxContext(c, `INSERT INTO user_book_status (user_id, book_id, status_id) VALUES ($1, $2, $3) RETURNING id`,
-		&data.UserID, &data.BookID, &data.StatusID).Scan(&createdId)
+	err := r.db.QueryRowxContext(c, `INSERT INTO user_book_status (user_id, book_id, status_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+		&data.UserID, &data.BookID, &data.StatusID, &data.CreatedAt, &data.UpdatedAt).Scan(&createdId)
 	if err != nil {
 		return models.UserBookStatus{}, err
 	}
@@ -233,15 +236,18 @@ func (r *Repository) UpsertHoarderTags(c *gin.Context, data []int, hoarderId int
 
 	if !adds.IsEmpty() {
 		type addarg struct {
-			HoarderID int `db:"hoarder_id"`
-			TagID     int `db:"tag_id"`
+			HoarderID int       `db:"hoarder_id"`
+			TagID     int       `db:"tag_id"`
+			CreatedAt time.Time `db:"created_at"`
+			UpdatedAt time.Time `db:"updated_at"`
 		}
 		var args []addarg
+		created := time.Now()
 		for _, e := range adds.ToSlice() {
-			args = append(args, addarg{HoarderID: hoarderId, TagID: e})
+			args = append(args, addarg{HoarderID: hoarderId, TagID: e, CreatedAt: created, UpdatedAt: created})
 		}
 
-		_, err = r.db.NamedExecContext(c, "INSERT INTO hoarder_tag (hoarder_id, tag_id) VALUES(:hoarder_id, :tag_id)", args)
+		_, err = r.db.NamedExecContext(c, "INSERT INTO hoarder_tag (hoarder_id, tag_id, created_at, updated_at) VALUES(:hoarder_id, :tag_id, :created_at, :updated_at)", args)
 		if err != nil {
 			return err
 		}
@@ -250,7 +256,7 @@ func (r *Repository) UpsertHoarderTags(c *gin.Context, data []int, hoarderId int
 }
 
 func (r *Repository) UpdateBook(c *gin.Context, data *models.Book) (models.Book, error) {
-	_, err := r.db.NamedExecContext(c, `UPDATE books SET title = :title WHERE user_id = :user_id AND book_id = :book_id`, &data)
+	_, err := r.db.NamedExecContext(c, `UPDATE books SET (title = :title, updated_at = :updated_at) WHERE user_id = :user_id AND book_id = :book_id`, &data)
 	if err != nil {
 		return models.Book{}, err
 	}

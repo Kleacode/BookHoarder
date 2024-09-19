@@ -5,6 +5,7 @@ import (
 	api "back/src/generated"
 	"back/src/generated/models"
 	"back/src/handler"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/volatiletech/null/v8"
@@ -103,9 +104,10 @@ func (s *Service) GetUserTags(c *gin.Context, userID int, params *api.GetUserIdT
 // PatchUserIdBooksBookId implements handler.ServiceInterface.
 func (s *Service) PatchUserIdBooksBookId(c *gin.Context, userId int, bookId int, data *api.Book) (api.ExistBook, error) {
 	_, err := s.repo.UpdateBook(c, &models.Book{
-		ID:     bookId,
-		Title:  null.NewString(*data.Title, true),
-		UserID: userId,
+		ID:        bookId,
+		Title:     null.NewString(*data.Title, true),
+		UserID:    userId,
+		UpdatedAt: time.Now(),
 	})
 	if err != nil {
 		return api.ExistBook{}, err
@@ -120,7 +122,7 @@ func (s *Service) PatchUserIdHoarderHoarderId(c *gin.Context, userId int, hoarde
 
 // PostUserIdHoarder implements handler.ServiceInterface.
 func (s *Service) PostUserIdHoarder(c *gin.Context, userId int, data *api.PostHoarderNew) (api.ExistHoarderBook, error) {
-	var newbook models.Book = models.Book{Title: null.NewString(*data.Book.Title, true), UserID: userId}
+	var newbook models.Book = models.Book{Title: null.NewString(*data.Book.Title, true), UserID: userId, CreatedAt: time.Now(), UpdatedAt: time.Now()}
 	b, err := s.repo.InsertBook(c, &newbook)
 	if err != nil {
 		return api.ExistHoarderBook{}, err
@@ -139,7 +141,7 @@ func (s *Service) PostUserIdHoarderBookId(c *gin.Context, userId int, bookId int
 	if err != nil {
 		return api.ExistHoarderBook{}, err
 	}
-	var new models.UserBookStatus = models.UserBookStatus{UserID: userId, BookID: bookId, StatusID: statusID}
+	var new models.UserBookStatus = models.UserBookStatus{UserID: userId, BookID: bookId, StatusID: statusID, CreatedAt: time.Now(), UpdatedAt: time.Now()}
 	result, err := s.repo.InsertHoarder(c, &new)
 	if err != nil {
 		return api.ExistHoarderBook{}, err
@@ -159,7 +161,7 @@ func (s *Service) PostUserIdHoarderBookId(c *gin.Context, userId int, bookId int
 
 // PostUserIdTags implements handler.ServiceInterface.
 func (s *Service) PostUserIdTags(c *gin.Context, userId int, data *api.TagInfo) (api.ExistTag, error) {
-	tag, err := s.repo.InsertTag(c, &models.Tag{Name: null.NewString(*data.Name, true), UserID: userId})
+	tag, err := s.repo.InsertTag(c, &models.Tag{Name: null.NewString(*data.Name, true), UserID: userId, CreatedAt: time.Now(), UpdatedAt: time.Now()})
 	if err != nil {
 		return api.ExistTag{}, err
 	}

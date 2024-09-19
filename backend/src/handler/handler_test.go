@@ -41,8 +41,8 @@ func (m *MockUsecase) GetHoarderBooks(c *gin.Context, userId int, params *api.Ge
 	panic("unimplemented")
 }
 
-// GetTags implements ServiceInterface.
-func (m *MockUsecase) GetTags(c *gin.Context, params *api.GetTagsParams) ([]api.ExistTag, error) {
+// GetUserTags implements ServiceInterface.
+func (m *MockUsecase) GetUserTags(c *gin.Context, userID int, params *api.GetUserIdTagsParams) ([]api.ExistTag, error) {
 	panic("unimplemented")
 }
 

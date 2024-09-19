@@ -23,9 +23,11 @@ import (
 
 // HoarderTag is an object representing the database table.
 type HoarderTag struct {
-	ID        int `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
-	HoarderID int `db:"hoarder_id" boil:"hoarder_id" json:"hoarder_id" toml:"hoarder_id" yaml:"hoarder_id"`
-	TagID     int `db:"tag_id" boil:"tag_id" json:"tag_id" toml:"tag_id" yaml:"tag_id"`
+	ID        int       `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
+	HoarderID int       `db:"hoarder_id" boil:"hoarder_id" json:"hoarder_id" toml:"hoarder_id" yaml:"hoarder_id"`
+	TagID     int       `db:"tag_id" boil:"tag_id" json:"tag_id" toml:"tag_id" yaml:"tag_id"`
+	CreatedAt time.Time `db:"created_at" boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *hoarderTagR `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
 	L hoarderTagL  `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -35,20 +37,28 @@ var HoarderTagColumns = struct {
 	ID        string
 	HoarderID string
 	TagID     string
+	CreatedAt string
+	UpdatedAt string
 }{
 	ID:        "id",
 	HoarderID: "hoarder_id",
 	TagID:     "tag_id",
+	CreatedAt: "created_at",
+	UpdatedAt: "updated_at",
 }
 
 var HoarderTagTableColumns = struct {
 	ID        string
 	HoarderID string
 	TagID     string
+	CreatedAt string
+	UpdatedAt string
 }{
 	ID:        "hoarder_tag.id",
 	HoarderID: "hoarder_tag.hoarder_id",
 	TagID:     "hoarder_tag.tag_id",
+	CreatedAt: "hoarder_tag.created_at",
+	UpdatedAt: "hoarder_tag.updated_at",
 }
 
 // Generated where
@@ -57,10 +67,14 @@ var HoarderTagWhere = struct {
 	ID        whereHelperint
 	HoarderID whereHelperint
 	TagID     whereHelperint
+	CreatedAt whereHelpertime_Time
+	UpdatedAt whereHelpertime_Time
 }{
 	ID:        whereHelperint{field: "\"hoarder_tag\".\"id\""},
 	HoarderID: whereHelperint{field: "\"hoarder_tag\".\"hoarder_id\""},
 	TagID:     whereHelperint{field: "\"hoarder_tag\".\"tag_id\""},
+	CreatedAt: whereHelpertime_Time{field: "\"hoarder_tag\".\"created_at\""},
+	UpdatedAt: whereHelpertime_Time{field: "\"hoarder_tag\".\"updated_at\""},
 }
 
 // HoarderTagRels is where relationship names are stored.
@@ -101,9 +115,9 @@ func (r *hoarderTagR) GetTag() *Tag {
 type hoarderTagL struct{}
 
 var (
-	hoarderTagAllColumns            = []string{"id", "hoarder_id", "tag_id"}
+	hoarderTagAllColumns            = []string{"id", "hoarder_id", "tag_id", "created_at", "updated_at"}
 	hoarderTagColumnsWithoutDefault = []string{"hoarder_id", "tag_id"}
-	hoarderTagColumnsWithDefault    = []string{"id"}
+	hoarderTagColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	hoarderTagPrimaryKeyColumns     = []string{"id"}
 	hoarderTagGeneratedColumns      = []string{}
 )
@@ -818,6 +832,16 @@ func (o *HoarderTag) Insert(ctx context.Context, exec boil.ContextExecutor, colu
 	}
 
 	var err error
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
+		}
+	}
 
 	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
@@ -893,6 +917,12 @@ func (o *HoarderTag) Insert(ctx context.Context, exec boil.ContextExecutor, colu
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *HoarderTag) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		o.UpdatedAt = currTime
+	}
+
 	var err error
 	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
@@ -1022,6 +1052,14 @@ func (o HoarderTagSlice) UpdateAll(ctx context.Context, exec boil.ContextExecuto
 func (o *HoarderTag) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns, opts ...UpsertOptionFunc) error {
 	if o == nil {
 		return errors.New("models: no hoarder_tag provided for upsert")
+	}
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		o.UpdatedAt = currTime
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {

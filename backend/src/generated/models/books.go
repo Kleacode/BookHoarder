@@ -24,32 +24,42 @@ import (
 
 // Book is an object representing the database table.
 type Book struct {
-	ID     int         `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
-	Title  null.String `db:"title" boil:"title" json:"title,omitempty" toml:"title" yaml:"title,omitempty"`
-	UserID int         `db:"user_id" boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	ID        int         `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
+	Title     null.String `db:"title" boil:"title" json:"title,omitempty" toml:"title" yaml:"title,omitempty"`
+	UserID    int         `db:"user_id" boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	CreatedAt time.Time   `db:"created_at" boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt time.Time   `db:"updated_at" boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *bookR `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
 	L bookL  `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var BookColumns = struct {
-	ID     string
-	Title  string
-	UserID string
+	ID        string
+	Title     string
+	UserID    string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:     "id",
-	Title:  "title",
-	UserID: "user_id",
+	ID:        "id",
+	Title:     "title",
+	UserID:    "user_id",
+	CreatedAt: "created_at",
+	UpdatedAt: "updated_at",
 }
 
 var BookTableColumns = struct {
-	ID     string
-	Title  string
-	UserID string
+	ID        string
+	Title     string
+	UserID    string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:     "books.id",
-	Title:  "books.title",
-	UserID: "books.user_id",
+	ID:        "books.id",
+	Title:     "books.title",
+	UserID:    "books.user_id",
+	CreatedAt: "books.created_at",
+	UpdatedAt: "books.updated_at",
 }
 
 // Generated where
@@ -127,14 +137,39 @@ func (w whereHelpernull_String) NIN(slice []string) qm.QueryMod {
 func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
 func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
 
+type whereHelpertime_Time struct{ field string }
+
+func (w whereHelpertime_Time) EQ(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.EQ, x)
+}
+func (w whereHelpertime_Time) NEQ(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.NEQ, x)
+}
+func (w whereHelpertime_Time) LT(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpertime_Time) LTE(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpertime_Time) GT(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
 var BookWhere = struct {
-	ID     whereHelperint
-	Title  whereHelpernull_String
-	UserID whereHelperint
+	ID        whereHelperint
+	Title     whereHelpernull_String
+	UserID    whereHelperint
+	CreatedAt whereHelpertime_Time
+	UpdatedAt whereHelpertime_Time
 }{
-	ID:     whereHelperint{field: "\"books\".\"id\""},
-	Title:  whereHelpernull_String{field: "\"books\".\"title\""},
-	UserID: whereHelperint{field: "\"books\".\"user_id\""},
+	ID:        whereHelperint{field: "\"books\".\"id\""},
+	Title:     whereHelpernull_String{field: "\"books\".\"title\""},
+	UserID:    whereHelperint{field: "\"books\".\"user_id\""},
+	CreatedAt: whereHelpertime_Time{field: "\"books\".\"created_at\""},
+	UpdatedAt: whereHelpertime_Time{field: "\"books\".\"updated_at\""},
 }
 
 // BookRels is where relationship names are stored.
@@ -175,9 +210,9 @@ func (r *bookR) GetUserBookStatuses() UserBookStatusSlice {
 type bookL struct{}
 
 var (
-	bookAllColumns            = []string{"id", "title", "user_id"}
+	bookAllColumns            = []string{"id", "title", "user_id", "created_at", "updated_at"}
 	bookColumnsWithoutDefault = []string{"user_id"}
-	bookColumnsWithDefault    = []string{"id", "title"}
+	bookColumnsWithDefault    = []string{"id", "title", "created_at", "updated_at"}
 	bookPrimaryKeyColumns     = []string{"id"}
 	bookGeneratedColumns      = []string{}
 )
@@ -894,6 +929,16 @@ func (o *Book) Insert(ctx context.Context, exec boil.ContextExecutor, columns bo
 	}
 
 	var err error
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
+		}
+	}
 
 	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
@@ -969,6 +1014,12 @@ func (o *Book) Insert(ctx context.Context, exec boil.ContextExecutor, columns bo
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *Book) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		o.UpdatedAt = currTime
+	}
+
 	var err error
 	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
@@ -1098,6 +1149,14 @@ func (o BookSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, col
 func (o *Book) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns, opts ...UpsertOptionFunc) error {
 	if o == nil {
 		return errors.New("models: no books provided for upsert")
+	}
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		o.UpdatedAt = currTime
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {

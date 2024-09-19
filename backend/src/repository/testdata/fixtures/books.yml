@@ -1,11 +1,20 @@
 - id: 1
   title: "book_title"
   user_id: 1
+  created_at: 2020-12-31 23:59:59
+  updated_at: 2020-12-31 23:59:59
+
 
 - id: 2
   title: "初期登録本"
   user_id: 2
+  created_at: 2020-12-31 23:59:59
+  updated_at: 2020-12-31 23:59:59
+
 
 - id: 3
   title: "book"
   user_id: 2
+  created_at: 2020-12-31 23:59:59
+  updated_at: 2020-12-31 23:59:59
+

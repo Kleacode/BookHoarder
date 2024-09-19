@@ -12,6 +12,7 @@ import (
 	"reflect"
 	"sort"
 	"testing"
+	"time"
 
 	"github.com/DATA-DOG/go-txdb"
 	"github.com/gin-gonic/gin"
@@ -84,19 +85,25 @@ func Test_GetBooks(t *testing.T) {
 			args: api.GetBooksParams{},
 			want: []models.Book{
 				{
-					ID:     1,
-					Title:  null.String{String: "book_title", Valid: true},
-					UserID: 1,
+					ID:        1,
+					Title:     null.String{String: "book_title", Valid: true},
+					UserID:    1,
+					CreatedAt: time.Date(2020, time.December, 31, 23, 59, 59, 0, time.FixedZone("", 0)),
+					UpdatedAt: time.Date(2020, time.December, 31, 23, 59, 59, 0, time.FixedZone("", 0)),
 				},
 				{
-					ID:     2,
-					Title:  null.String{String: "初期登録本", Valid: true},
-					UserID: 2,
+					ID:        2,
+					Title:     null.String{String: "初期登録本", Valid: true},
+					UserID:    2,
+					CreatedAt: time.Date(2020, time.December, 31, 23, 59, 59, 0, time.FixedZone("", 0)),
+					UpdatedAt: time.Date(2020, time.December, 31, 23, 59, 59, 0, time.FixedZone("", 0)),
 				},
 				{
-					ID:     3,
-					Title:  null.String{String: "book", Valid: true},
-					UserID: 2,
+					ID:        3,
+					Title:     null.String{String: "book", Valid: true},
+					UserID:    2,
+					CreatedAt: time.Date(2020, time.December, 31, 23, 59, 59, 0, time.FixedZone("", 0)),
+					UpdatedAt: time.Date(2020, time.December, 31, 23, 59, 59, 0, time.FixedZone("", 0)),
 				},
 			},
 		},
@@ -105,14 +112,18 @@ func Test_GetBooks(t *testing.T) {
 			args: api.GetBooksParams{Title: strPtr("book")},
 			want: []models.Book{
 				{
-					ID:     1,
-					Title:  null.String{String: "book_title", Valid: true},
-					UserID: 1,
+					ID:        1,
+					Title:     null.String{String: "book_title", Valid: true},
+					UserID:    1,
+					CreatedAt: time.Date(2020, time.December, 31, 23, 59, 59, 0, time.FixedZone("", 0)),
+					UpdatedAt: time.Date(2020, time.December, 31, 23, 59, 59, 0, time.FixedZone("", 0)),
 				},
 				{
-					ID:     3,
-					Title:  null.String{String: "book", Valid: true},
-					UserID: 2,
+					ID:        3,
+					Title:     null.String{String: "book", Valid: true},
+					UserID:    2,
+					CreatedAt: time.Date(2020, time.December, 31, 23, 59, 59, 0, time.FixedZone("", 0)),
+					UpdatedAt: time.Date(2020, time.December, 31, 23, 59, 59, 0, time.FixedZone("", 0)),
 				},
 			},
 		},
@@ -196,45 +207,28 @@ func Test_GetBookBookId(t *testing.T) {
 
 func Test_GetTags(t *testing.T) {
 	testcases := []struct {
-		name  string
-		param api.GetTagsParams
-		want  []models.Tag
+		name   string
+		userID int
+		param  api.GetUserIdTagsParams
+		want   []models.Tag
 	}{
 		{
-			name:  "全タグの取得",
-			param: api.GetTagsParams{},
+			name:   "タグの取得1",
+			userID: 1,
+			param:  api.GetUserIdTagsParams{},
 			want: []models.Tag{
 				{
 					ID:     1,
 					Name:   null.String{String: "tag1", Valid: true},
 					UserID: 1,
-				},
-				{
-					ID:     2,
-					Name:   null.String{String: "tag2", Valid: true},
-					UserID: 2,
-				},
-				{
-					ID:     3,
-					Name:   null.String{String: "tag3", Valid: true},
-					UserID: 2,
-				},
-				{
-					ID:     4,
-					Name:   null.String{String: "3t_ttt", Valid: true},
-					UserID: 3,
 				},
 			},
 		},
 		{
-			name:  "検索1",
-			param: api.GetTagsParams{Name: strPtr("tag")},
+			name:   "タグの取得2",
+			userID: 2,
+			param:  api.GetUserIdTagsParams{},
 			want: []models.Tag{
-				{
-					ID:     1,
-					Name:   null.String{String: "tag1", Valid: true},
-					UserID: 1,
-				},
 				{
 					ID:     2,
 					Name:   null.String{String: "tag2", Valid: true},
@@ -248,18 +242,26 @@ func Test_GetTags(t *testing.T) {
 			},
 		},
 		{
-			name:  "検索2",
-			param: api.GetTagsParams{Name: strPtr("3")},
+			name:   "タグの取得3",
+			userID: 3,
+			param:  api.GetUserIdTagsParams{},
+			want: []models.Tag{
+				{
+					ID:     4,
+					Name:   null.String{String: "3t_ttt", Valid: true},
+					UserID: 3,
+				},
+			},
+		},
+		{
+			name:   "検索1",
+			userID: 2,
+			param:  api.GetUserIdTagsParams{Name: strPtr("3")},
 			want: []models.Tag{
 				{
 					ID:     3,
 					Name:   null.String{String: "tag3", Valid: true},
 					UserID: 2,
-				},
-				{
-					ID:     4,
-					Name:   null.String{String: "3t_ttt", Valid: true},
-					UserID: 3,
 				},
 			},
 		},
@@ -268,7 +270,7 @@ func Test_GetTags(t *testing.T) {
 	for _, tt := range testcases {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, _ := gin.CreateTestContext(httptest.NewRecorder())
-			result, err := repo.GetTags(ctx, &tt.param)
+			result, err := repo.GetUserTags(ctx, tt.userID, &tt.param)
 
 			if err != nil {
 				t.Errorf("error: %v", err)
@@ -333,7 +335,7 @@ func Test_Series_Tag(t *testing.T) {
 	var inittags []models.Tag
 	var err error
 
-	inittags, err = repo.GetTags(ctx, &api.GetTagsParams{})
+	inittags, err = repo.GetUserTags(ctx, 1, &api.GetUserIdTagsParams{})
 	if err != nil {
 		t.Errorf("error")
 	}
@@ -342,30 +344,30 @@ func Test_Series_Tag(t *testing.T) {
 	tag1, err := repo.InsertTag(ctx, &post1)
 
 	inittags = append(inittags, tag1)
-	tags, err := repo.GetTags(ctx, &api.GetTagsParams{})
+	tags, err := repo.GetUserTags(ctx, 1, &api.GetUserIdTagsParams{})
 	if !reflect.DeepEqual(inittags, tags) {
 		t.Errorf("mismatch %v, %v", inittags, tags)
 	}
 
-	post2 := models.Tag{Name: null.NewString("new tag2", true), UserID: 2}
+	post2 := models.Tag{Name: null.NewString("new tag2", true), UserID: 1}
 	tag2, err := repo.InsertTag(ctx, &post2)
 
 	inittags = append(inittags, tag2)
-	tags, err = repo.GetTags(ctx, &api.GetTagsParams{})
+	tags, err = repo.GetUserTags(ctx, 1, &api.GetUserIdTagsParams{})
 	if !reflect.DeepEqual(inittags, tags) {
 		t.Errorf("mismatch %v, %v", inittags, tags)
 	}
 
 	repo.DeleteUserIdTagsTagId(ctx, tag2.UserID, tag2.ID)
 	inittags = inittags[:len(inittags)-1]
-	tags, err = repo.GetTags(ctx, &api.GetTagsParams{})
+	tags, err = repo.GetUserTags(ctx, 1, &api.GetUserIdTagsParams{})
 	if !reflect.DeepEqual(inittags, tags) {
 		t.Errorf("mismatch %v, %v", inittags, tags)
 	}
 
 	repo.DeleteUserIdTagsTagId(ctx, tag1.UserID, tag1.ID)
 	inittags = inittags[:len(inittags)-1]
-	tags, err = repo.GetTags(ctx, &api.GetTagsParams{})
+	tags, err = repo.GetUserTags(ctx, 1, &api.GetUserIdTagsParams{})
 	if !reflect.DeepEqual(inittags, tags) {
 		t.Errorf("mismatch %v, %v", inittags, tags)
 	}

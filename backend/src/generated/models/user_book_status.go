@@ -23,51 +23,65 @@ import (
 
 // UserBookStatus is an object representing the database table.
 type UserBookStatus struct {
-	ID       int `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
-	UserID   int `db:"user_id" boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	BookID   int `db:"book_id" boil:"book_id" json:"book_id" toml:"book_id" yaml:"book_id"`
-	StatusID int `db:"status_id" boil:"status_id" json:"status_id" toml:"status_id" yaml:"status_id"`
+	ID        int       `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
+	UserID    int       `db:"user_id" boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	BookID    int       `db:"book_id" boil:"book_id" json:"book_id" toml:"book_id" yaml:"book_id"`
+	StatusID  int       `db:"status_id" boil:"status_id" json:"status_id" toml:"status_id" yaml:"status_id"`
+	CreatedAt time.Time `db:"created_at" boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt time.Time `db:"updated_at" boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *userBookStatusR `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userBookStatusL  `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var UserBookStatusColumns = struct {
-	ID       string
-	UserID   string
-	BookID   string
-	StatusID string
+	ID        string
+	UserID    string
+	BookID    string
+	StatusID  string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:       "id",
-	UserID:   "user_id",
-	BookID:   "book_id",
-	StatusID: "status_id",
+	ID:        "id",
+	UserID:    "user_id",
+	BookID:    "book_id",
+	StatusID:  "status_id",
+	CreatedAt: "created_at",
+	UpdatedAt: "updated_at",
 }
 
 var UserBookStatusTableColumns = struct {
-	ID       string
-	UserID   string
-	BookID   string
-	StatusID string
+	ID        string
+	UserID    string
+	BookID    string
+	StatusID  string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:       "user_book_status.id",
-	UserID:   "user_book_status.user_id",
-	BookID:   "user_book_status.book_id",
-	StatusID: "user_book_status.status_id",
+	ID:        "user_book_status.id",
+	UserID:    "user_book_status.user_id",
+	BookID:    "user_book_status.book_id",
+	StatusID:  "user_book_status.status_id",
+	CreatedAt: "user_book_status.created_at",
+	UpdatedAt: "user_book_status.updated_at",
 }
 
 // Generated where
 
 var UserBookStatusWhere = struct {
-	ID       whereHelperint
-	UserID   whereHelperint
-	BookID   whereHelperint
-	StatusID whereHelperint
+	ID        whereHelperint
+	UserID    whereHelperint
+	BookID    whereHelperint
+	StatusID  whereHelperint
+	CreatedAt whereHelpertime_Time
+	UpdatedAt whereHelpertime_Time
 }{
-	ID:       whereHelperint{field: "\"user_book_status\".\"id\""},
-	UserID:   whereHelperint{field: "\"user_book_status\".\"user_id\""},
-	BookID:   whereHelperint{field: "\"user_book_status\".\"book_id\""},
-	StatusID: whereHelperint{field: "\"user_book_status\".\"status_id\""},
+	ID:        whereHelperint{field: "\"user_book_status\".\"id\""},
+	UserID:    whereHelperint{field: "\"user_book_status\".\"user_id\""},
+	BookID:    whereHelperint{field: "\"user_book_status\".\"book_id\""},
+	StatusID:  whereHelperint{field: "\"user_book_status\".\"status_id\""},
+	CreatedAt: whereHelpertime_Time{field: "\"user_book_status\".\"created_at\""},
+	UpdatedAt: whereHelpertime_Time{field: "\"user_book_status\".\"updated_at\""},
 }
 
 // UserBookStatusRels is where relationship names are stored.
@@ -128,9 +142,9 @@ func (r *userBookStatusR) GetHoarderHoarderTags() HoarderTagSlice {
 type userBookStatusL struct{}
 
 var (
-	userBookStatusAllColumns            = []string{"id", "user_id", "book_id", "status_id"}
+	userBookStatusAllColumns            = []string{"id", "user_id", "book_id", "status_id", "created_at", "updated_at"}
 	userBookStatusColumnsWithoutDefault = []string{"user_id", "book_id", "status_id"}
-	userBookStatusColumnsWithDefault    = []string{"id"}
+	userBookStatusColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	userBookStatusPrimaryKeyColumns     = []string{"id"}
 	userBookStatusGeneratedColumns      = []string{}
 )
@@ -1203,6 +1217,16 @@ func (o *UserBookStatus) Insert(ctx context.Context, exec boil.ContextExecutor, 
 	}
 
 	var err error
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
+		}
+	}
 
 	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
@@ -1278,6 +1302,12 @@ func (o *UserBookStatus) Insert(ctx context.Context, exec boil.ContextExecutor, 
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *UserBookStatus) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		o.UpdatedAt = currTime
+	}
+
 	var err error
 	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
@@ -1407,6 +1437,14 @@ func (o UserBookStatusSlice) UpdateAll(ctx context.Context, exec boil.ContextExe
 func (o *UserBookStatus) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns, opts ...UpsertOptionFunc) error {
 	if o == nil {
 		return errors.New("models: no user_book_status provided for upsert")
+	}
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		o.UpdatedAt = currTime
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {

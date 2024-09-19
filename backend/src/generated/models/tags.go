@@ -24,44 +24,58 @@ import (
 
 // Tag is an object representing the database table.
 type Tag struct {
-	ID     int         `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name   null.String `db:"name" boil:"name" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
-	UserID int         `db:"user_id" boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	ID        int         `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name      null.String `db:"name" boil:"name" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
+	UserID    int         `db:"user_id" boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	CreatedAt time.Time   `db:"created_at" boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt time.Time   `db:"updated_at" boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *tagR `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
 	L tagL  `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var TagColumns = struct {
-	ID     string
-	Name   string
-	UserID string
+	ID        string
+	Name      string
+	UserID    string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:     "id",
-	Name:   "name",
-	UserID: "user_id",
+	ID:        "id",
+	Name:      "name",
+	UserID:    "user_id",
+	CreatedAt: "created_at",
+	UpdatedAt: "updated_at",
 }
 
 var TagTableColumns = struct {
-	ID     string
-	Name   string
-	UserID string
+	ID        string
+	Name      string
+	UserID    string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:     "tags.id",
-	Name:   "tags.name",
-	UserID: "tags.user_id",
+	ID:        "tags.id",
+	Name:      "tags.name",
+	UserID:    "tags.user_id",
+	CreatedAt: "tags.created_at",
+	UpdatedAt: "tags.updated_at",
 }
 
 // Generated where
 
 var TagWhere = struct {
-	ID     whereHelperint
-	Name   whereHelpernull_String
-	UserID whereHelperint
+	ID        whereHelperint
+	Name      whereHelpernull_String
+	UserID    whereHelperint
+	CreatedAt whereHelpertime_Time
+	UpdatedAt whereHelpertime_Time
 }{
-	ID:     whereHelperint{field: "\"tags\".\"id\""},
-	Name:   whereHelpernull_String{field: "\"tags\".\"name\""},
-	UserID: whereHelperint{field: "\"tags\".\"user_id\""},
+	ID:        whereHelperint{field: "\"tags\".\"id\""},
+	Name:      whereHelpernull_String{field: "\"tags\".\"name\""},
+	UserID:    whereHelperint{field: "\"tags\".\"user_id\""},
+	CreatedAt: whereHelpertime_Time{field: "\"tags\".\"created_at\""},
+	UpdatedAt: whereHelpertime_Time{field: "\"tags\".\"updated_at\""},
 }
 
 // TagRels is where relationship names are stored.
@@ -102,9 +116,9 @@ func (r *tagR) GetHoarderTags() HoarderTagSlice {
 type tagL struct{}
 
 var (
-	tagAllColumns            = []string{"id", "name", "user_id"}
+	tagAllColumns            = []string{"id", "name", "user_id", "created_at", "updated_at"}
 	tagColumnsWithoutDefault = []string{"user_id"}
-	tagColumnsWithDefault    = []string{"id", "name"}
+	tagColumnsWithDefault    = []string{"id", "name", "created_at", "updated_at"}
 	tagPrimaryKeyColumns     = []string{"id"}
 	tagGeneratedColumns      = []string{}
 )
@@ -821,6 +835,16 @@ func (o *Tag) Insert(ctx context.Context, exec boil.ContextExecutor, columns boi
 	}
 
 	var err error
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
+		}
+	}
 
 	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
@@ -896,6 +920,12 @@ func (o *Tag) Insert(ctx context.Context, exec boil.ContextExecutor, columns boi
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *Tag) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		o.UpdatedAt = currTime
+	}
+
 	var err error
 	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
@@ -1025,6 +1055,14 @@ func (o TagSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, cols
 func (o *Tag) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns, opts ...UpsertOptionFunc) error {
 	if o == nil {
 		return errors.New("models: no tags provided for upsert")
+	}
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		o.UpdatedAt = currTime
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {

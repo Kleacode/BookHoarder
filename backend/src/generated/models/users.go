@@ -24,37 +24,51 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	ID   int         `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name null.String `db:"name" boil:"name" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
+	ID        int         `db:"id" boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name      null.String `db:"name" boil:"name" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
+	CreatedAt time.Time   `db:"created_at" boil:"created_at" json:"created_at" toml:"created_at" yaml:"created_at"`
+	UpdatedAt time.Time   `db:"updated_at" boil:"updated_at" json:"updated_at" toml:"updated_at" yaml:"updated_at"`
 
 	R *userR `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `db:"-" boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var UserColumns = struct {
-	ID   string
-	Name string
+	ID        string
+	Name      string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:   "id",
-	Name: "name",
+	ID:        "id",
+	Name:      "name",
+	CreatedAt: "created_at",
+	UpdatedAt: "updated_at",
 }
 
 var UserTableColumns = struct {
-	ID   string
-	Name string
+	ID        string
+	Name      string
+	CreatedAt string
+	UpdatedAt string
 }{
-	ID:   "users.id",
-	Name: "users.name",
+	ID:        "users.id",
+	Name:      "users.name",
+	CreatedAt: "users.created_at",
+	UpdatedAt: "users.updated_at",
 }
 
 // Generated where
 
 var UserWhere = struct {
-	ID   whereHelperint
-	Name whereHelpernull_String
+	ID        whereHelperint
+	Name      whereHelpernull_String
+	CreatedAt whereHelpertime_Time
+	UpdatedAt whereHelpertime_Time
 }{
-	ID:   whereHelperint{field: "\"users\".\"id\""},
-	Name: whereHelpernull_String{field: "\"users\".\"name\""},
+	ID:        whereHelperint{field: "\"users\".\"id\""},
+	Name:      whereHelpernull_String{field: "\"users\".\"name\""},
+	CreatedAt: whereHelpertime_Time{field: "\"users\".\"created_at\""},
+	UpdatedAt: whereHelpertime_Time{field: "\"users\".\"updated_at\""},
 }
 
 // UserRels is where relationship names are stored.
@@ -105,9 +119,9 @@ func (r *userR) GetUserBookStatuses() UserBookStatusSlice {
 type userL struct{}
 
 var (
-	userAllColumns            = []string{"id", "name"}
+	userAllColumns            = []string{"id", "name", "created_at", "updated_at"}
 	userColumnsWithoutDefault = []string{}
-	userColumnsWithDefault    = []string{"id", "name"}
+	userColumnsWithDefault    = []string{"id", "name", "created_at", "updated_at"}
 	userPrimaryKeyColumns     = []string{"id"}
 	userGeneratedColumns      = []string{}
 )
@@ -1006,6 +1020,16 @@ func (o *User) Insert(ctx context.Context, exec boil.ContextExecutor, columns bo
 	}
 
 	var err error
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		if o.UpdatedAt.IsZero() {
+			o.UpdatedAt = currTime
+		}
+	}
 
 	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
@@ -1081,6 +1105,12 @@ func (o *User) Insert(ctx context.Context, exec boil.ContextExecutor, columns bo
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *User) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		o.UpdatedAt = currTime
+	}
+
 	var err error
 	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
@@ -1210,6 +1240,14 @@ func (o UserSlice) UpdateAll(ctx context.Context, exec boil.ContextExecutor, col
 func (o *User) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnConflict bool, conflictColumns []string, updateColumns, insertColumns boil.Columns, opts ...UpsertOptionFunc) error {
 	if o == nil {
 		return errors.New("models: no users provided for upsert")
+	}
+	if !boil.TimestampsAreSkipped(ctx) {
+		currTime := time.Now().In(boil.GetLocation())
+
+		if o.CreatedAt.IsZero() {
+			o.CreatedAt = currTime
+		}
+		o.UpdatedAt = currTime
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
