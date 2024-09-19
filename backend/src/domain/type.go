@@ -49,20 +49,25 @@ func (r *ExistHoarderRecord) ToExistHoarderBook() (api.ExistHoarderBook, error) 
 		return api.ExistHoarderBook{}, err
 	}
 
-	ids := strings.Split(r.TagIDArray, ",")
-	names := strings.Split(r.TagNameArray, ",")
-
 	var tags []api.Tag
-	for i, id := range ids {
-		num_id, err := strconv.Atoi(id)
-		if err != nil {
-			return api.ExistHoarderBook{}, err
+	if r.TagIDArray != "" && r.TagNameArray != "" {
+		ids := strings.Split(r.TagIDArray, ",")
+		names := strings.Split(r.TagNameArray, ",")
+		for i, id := range ids {
+			num_id, err := strconv.Atoi(id)
+			if err != nil {
+				return api.ExistHoarderBook{}, ErrInternal
+			}
+			tags = append(tags, api.Tag{Id: &num_id, Name: &names[i]})
 		}
-		tags = append(tags, api.Tag{Id: &num_id, Name: &names[i]})
 	}
 
 	return api.ExistHoarderBook{
-		Book:      &api.ExistBook{},
+		Book: &api.ExistBook{
+			Title:  &r.Title,
+			UserId: &r.BookUserID,
+			BookId: &r.BookID,
+		},
 		HoarderId: &r.HoarderID,
 		Status:    &s,
 		Tags:      &tags,

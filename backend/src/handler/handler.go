@@ -11,7 +11,7 @@ import (
 type ServiceInterface interface {
 	GetBooks(c *gin.Context, params *api.GetBooksParams) ([]api.ExistBook, error)
 	GetBook(c *gin.Context, bookID int) (api.ExistBook, error)
-	GetTags(c *gin.Context, params *api.GetTagsParams) ([]api.ExistTag, error)
+	GetUserTags(c *gin.Context, userID int, params *api.GetUserIdTagsParams) ([]api.ExistTag, error)
 	GetHoarderBooks(c *gin.Context, userId int, params *api.GetUserIdHoarderParams) ([]api.ExistHoarderBook, error)
 
 	DeleteUserIdBooksBookId(c *gin.Context, userId int, bookId int) error
@@ -28,6 +28,16 @@ type ServiceInterface interface {
 
 type Handler struct {
 	service ServiceInterface
+}
+
+// GetUserIdTags implements api.ServerInterface.
+func (h *Handler) GetUserIdTags(c *gin.Context, userId int, params api.GetUserIdTagsParams) {
+	tags, err := h.service.GetUserTags(c, userId, &params)
+	if err != nil {
+		c.JSON(domain.GetErrorResponse(err))
+		return
+	}
+	c.JSON(http.StatusOK, tags)
 }
 
 // DeleteUserIdBooksBookId implements api.ServerInterface.
@@ -78,16 +88,6 @@ func (h *Handler) GetBooksBookId(c *gin.Context, bookId int) {
 		return
 	}
 	c.JSON(http.StatusOK, book)
-}
-
-// GetTags implements api.ServerInterface.
-func (h *Handler) GetTags(c *gin.Context, params api.GetTagsParams) {
-	tags, err := h.service.GetTags(c, &params)
-	if err != nil {
-		c.JSON(domain.GetErrorResponse(err))
-		return
-	}
-	c.JSON(http.StatusOK, tags)
 }
 
 // GetUserIdHoarder implements api.ServerInterface.

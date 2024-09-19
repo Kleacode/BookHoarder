@@ -75,12 +75,12 @@ func (r *Repository) GetBooks(c *gin.Context, params *api.GetBooksParams) ([]mod
 	} else {
 		rows, err = r.db.QueryxContext(c, query)
 	}
-	defer rows.Close()
 
 	if err != nil {
 		return nil, domain.ErrInternal
 	}
 
+	defer rows.Close()
 	var books []models.Book
 	for rows.Next() {
 		var book models.Book
@@ -104,24 +104,24 @@ func (r *Repository) GetBooksBookId(c *gin.Context, bookId int) (models.Book, er
 	return book, nil
 }
 
-// GetTags implements usecases.RepositoryInterface.
-func (r *Repository) GetTags(c *gin.Context, params *api.GetTagsParams) ([]models.Tag, error) {
+func (r *Repository) GetUserTags(c *gin.Context, userId int, params *api.GetUserIdTagsParams) ([]models.Tag, error) {
 	var rows *sqlx.Rows
 	var err error
 	query := `SELECT * FROM tags`
 	if params.Name != nil {
 		searchWord := "%" + *params.Name + "%"
-		query += ` WHERE name LIKE $1`
-		rows, err = r.db.QueryxContext(c, query, searchWord)
+		query += ` WHERE user_id = $1 AND name LIKE $2`
+		rows, err = r.db.QueryxContext(c, query, userId, searchWord)
 	} else {
-		rows, err = r.db.QueryxContext(c, query)
+		query += ` WHERE user_id = $1`
+		rows, err = r.db.QueryxContext(c, query, userId)
 	}
-	defer rows.Close()
 
 	if err != nil {
 		return nil, domain.ErrInternal
 	}
 
+	defer rows.Close()
 	var tags []models.Tag
 	for rows.Next() {
 		var tag models.Tag
@@ -247,6 +247,14 @@ func (r *Repository) UpsertHoarderTags(c *gin.Context, data []int, hoarderId int
 		}
 	}
 	return nil
+}
+
+func (r *Repository) UpdateBook(c *gin.Context, data *models.Book) (models.Book, error) {
+	_, err := r.db.NamedExecContext(c, `UPDATE books SET title = :title WHERE user_id = :user_id AND book_id = :book_id`, &data)
+	if err != nil {
+		return models.Book{}, err
+	}
+	return models.Book{}, nil
 }
 
 func NewRepository(db *sqlx.DB) usecases.RepositoryInterface {

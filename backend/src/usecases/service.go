@@ -14,7 +14,7 @@ type RepositoryInterface interface {
 	GetBooks(c *gin.Context, params *api.GetBooksParams) ([]models.Book, error)
 	GetBooksBookId(c *gin.Context, bookId int) (models.Book, error)
 	GetHoarders(c *gin.Context, userId int, params *api.GetUserIdHoarderParams) ([]domain.ExistHoarderRecord, error)
-	GetTags(c *gin.Context, params *api.GetTagsParams) ([]models.Tag, error)
+	GetUserTags(c *gin.Context, userId int, params *api.GetUserIdTagsParams) ([]models.Tag, error)
 
 	DeleteUserIdBooksBookId(c *gin.Context, userId int, bookId int) error
 	DeleteUserIdHoarderHoarderId(c *gin.Context, userId int, hoarderId int) error
@@ -24,6 +24,9 @@ type RepositoryInterface interface {
 	InsertBook(c *gin.Context, data *models.Book) (models.Book, error)
 	InsertHoarder(c *gin.Context, data *models.UserBookStatus) (models.UserBookStatus, error)
 	UpsertHoarderTags(c *gin.Context, data []int, hoarderId int) error
+
+	UpdateBook(c *gin.Context, data *models.Book) (models.Book, error)
+	// UpdateHoarder(c *gin.Context, data *models.UserBookStatus, data *api.PostHoarderExist)
 }
 
 type Service struct {
@@ -84,9 +87,8 @@ func (s *Service) GetHoarderBooks(c *gin.Context, userId int, params *api.GetUse
 	return result, nil
 }
 
-// GetTags implements handler.ServiceInterface.
-func (s *Service) GetTags(c *gin.Context, params *api.GetTagsParams) ([]api.ExistTag, error) {
-	tags, err := s.repo.GetTags(c, params)
+func (s *Service) GetUserTags(c *gin.Context, userID int, params *api.GetUserIdTagsParams) ([]api.ExistTag, error) {
+	tags, err := s.repo.GetUserTags(c, userID, params)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +102,15 @@ func (s *Service) GetTags(c *gin.Context, params *api.GetTagsParams) ([]api.Exis
 
 // PatchUserIdBooksBookId implements handler.ServiceInterface.
 func (s *Service) PatchUserIdBooksBookId(c *gin.Context, userId int, bookId int, data *api.Book) (api.ExistBook, error) {
-	panic("unimplemented")
+	_, err := s.repo.UpdateBook(c, &models.Book{
+		ID:     bookId,
+		Title:  null.NewString(*data.Title, true),
+		UserID: userId,
+	})
+	if err != nil {
+		return api.ExistBook{}, err
+	}
+	return api.ExistBook{}, nil
 }
 
 // PatchUserIdHoarderHoarderId implements handler.ServiceInterface.
