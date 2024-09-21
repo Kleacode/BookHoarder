@@ -12,7 +12,7 @@ export const DropDownForm = <T,>({
 	...props
 }: DropDownFormType<T>) => {
 	return (
-		<div className="w-full md:w-1/3 px-3 mb-6 md:mb-0">
+		<div className="w-full mb-6 md:mb-0">
 			<div className="text-gray-700 text-xs font-bold">{label}</div>
 			<div className="relative">
 				<select
