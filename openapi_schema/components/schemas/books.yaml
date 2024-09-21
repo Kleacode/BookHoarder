@@ -9,6 +9,9 @@ components:
 
     tag:
       type: object
+      required:
+        - id
+        - name
       properties:
         id:
           type: integer
@@ -22,11 +25,16 @@ components:
 
     book:
       type: object
+      required:
+        - title
       properties:
         title:
           type: string
 
 new_book:
+  required:
+    - book
+    - userId
   allOf:
     - $ref: "#/components/schemas/book"
     - properties:
@@ -34,6 +42,9 @@ new_book:
           type: integer
 
 exist_book:
+  required:
+    - new_book
+    - bookId
   allOf:
     - $ref: "#/new_book"
     - properties:
@@ -42,6 +53,10 @@ exist_book:
 
 hoarder_book:
   type: object
+  required:
+    - book
+    - status
+    - tags
   properties:
     book:
       $ref: "#/exist_book"
@@ -51,6 +66,9 @@ hoarder_book:
       $ref: "#/components/schemas/tags"
 
 exist_hoarder_book:
+  required:
+    - hoarderId
+    - hoarder_book
   allOf:
     - properties:
         hoarderId:
@@ -58,10 +76,16 @@ exist_hoarder_book:
     - $ref: "#/hoarder_book"
 
 post_book:
+  required:
+    - book
   allOf:
     - $ref: "#/components/schemas/book"
 
 post_hoarder_new:
+  required:
+    - book
+    - status
+    - tags
   allOf:
     - properties:
         book:
@@ -72,6 +96,9 @@ post_hoarder_new:
           $ref: "#/components/schemas/tags"
 
 post_hoarder_exist:
+  required:
+    - status
+    - tags
   allOf:
     - properties:
         status:
@@ -87,3 +114,7 @@ patch_hoarder:
           $ref: "#/components/schemas/status"
         tags:
           $ref: "#/components/schemas/tags"
+
+patch_book:
+  allOf:
+    - $ref: "#/components/schemas/book"

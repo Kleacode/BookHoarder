@@ -7,7 +7,7 @@ patch:
     content:
       'application/json':
         schema:
-          $ref: "../components/schemas/books.yaml#/post_book"
+          $ref: "../components/schemas/books.yaml#/patch_book"
   responses:
     "200":
       description: 更新成功

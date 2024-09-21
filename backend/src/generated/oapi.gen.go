@@ -20,7 +20,7 @@ const (
 
 // Book defines model for book.
 type Book struct {
-	Title *string `json:"title,omitempty"`
+	Title string `json:"title"`
 }
 
 // Error defines model for error.
@@ -31,47 +31,47 @@ type Error struct {
 
 // ExistBook defines model for exist_book.
 type ExistBook struct {
-	BookId *int    `json:"bookId,omitempty"`
-	Title  *string `json:"title,omitempty"`
-	UserId *int    `json:"userId,omitempty"`
+	BookId *int   `json:"bookId,omitempty"`
+	Title  string `json:"title"`
+	UserId *int   `json:"userId,omitempty"`
 }
 
 // ExistHoarderBook defines model for exist_hoarder_book.
 type ExistHoarderBook struct {
-	Book      *ExistBook `json:"book,omitempty"`
-	HoarderId *int       `json:"hoarderId,omitempty"`
-	Status    *Status    `json:"status,omitempty"`
-	Tags      *Tags      `json:"tags,omitempty"`
+	Book      ExistBook `json:"book"`
+	HoarderId *int      `json:"hoarderId,omitempty"`
+	Status    Status    `json:"status"`
+	Tags      Tags      `json:"tags"`
 }
 
 // ExistTag defines model for exist_tag.
 type ExistTag struct {
-	Name   *string `json:"name,omitempty"`
-	TagId  *int    `json:"tagId,omitempty"`
-	UserId *int    `json:"userId,omitempty"`
+	Name   string `json:"name"`
+	TagId  *int   `json:"tagId,omitempty"`
+	UserId *int   `json:"userId,omitempty"`
 }
 
 // HoarderBook defines model for hoarder_book.
 type HoarderBook struct {
-	Book   *ExistBook `json:"book,omitempty"`
-	Status *Status    `json:"status,omitempty"`
-	Tags   *Tags      `json:"tags,omitempty"`
+	Book   ExistBook `json:"book"`
+	Status Status    `json:"status"`
+	Tags   Tags      `json:"tags"`
 }
 
 // NewBook defines model for new_book.
 type NewBook struct {
-	Title  *string `json:"title,omitempty"`
-	UserId *int    `json:"userId,omitempty"`
+	Title  string `json:"title"`
+	UserId *int   `json:"userId,omitempty"`
 }
+
+// PatchBook defines model for patch_book.
+type PatchBook = Book
 
 // PatchHoarder defines model for patch_hoarder.
 type PatchHoarder struct {
 	Status *Status `json:"status,omitempty"`
 	Tags   *Tags   `json:"tags,omitempty"`
 }
-
-// PostBook defines model for post_book.
-type PostBook = Book
 
 // PostHoarderExist defines model for post_hoarder_exist.
 type PostHoarderExist struct {
@@ -91,13 +91,13 @@ type Status string
 
 // Tag defines model for tag.
 type Tag struct {
-	Id   *int    `json:"id,omitempty"`
-	Name *string `json:"name,omitempty"`
+	Id   int    `json:"id"`
+	Name string `json:"name"`
 }
 
 // TagInfo defines model for tag_info.
 type TagInfo struct {
-	Name *string `json:"name,omitempty"`
+	Name string `json:"name"`
 }
 
 // Tags defines model for tags.
@@ -135,7 +135,7 @@ type GetUserIdTagsParams struct {
 }
 
 // PatchUserIdBooksBookIdJSONRequestBody defines body for PatchUserIdBooksBookId for application/json ContentType.
-type PatchUserIdBooksBookIdJSONRequestBody = PostBook
+type PatchUserIdBooksBookIdJSONRequestBody = PatchBook
 
 // PostUserIdHoarderJSONRequestBody defines body for PostUserIdHoarder for application/json ContentType.
 type PostUserIdHoarderJSONRequestBody = PostHoarderNew

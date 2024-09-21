@@ -130,7 +130,7 @@ export interface paths {
             };
             requestBody?: {
                 content: {
-                    "application/json": components["schemas"]["post_book"];
+                    "application/json": components["schemas"]["patch_book"];
                 };
             };
             responses: {
@@ -443,49 +443,49 @@ export interface components {
             message: string;
         };
         book: {
-            title?: string;
+            title: string;
         };
         new_book: components["schemas"]["book"] & {
-            userId?: number;
+            userId: number;
         };
         exist_book: components["schemas"]["new_book"] & {
-            bookId?: number;
+            bookId: number;
         };
-        post_book: components["schemas"]["book"];
+        patch_book: components["schemas"]["book"];
         /** @enum {string} */
         status: "todo" | "wip" | "done";
         tag: {
-            id?: number;
-            name?: string;
+            id: number;
+            name: string;
         };
         tags: components["schemas"]["tag"][];
         hoarder_book: {
-            book?: components["schemas"]["exist_book"];
-            status?: components["schemas"]["status"];
-            tags?: components["schemas"]["tags"];
+            book: components["schemas"]["exist_book"];
+            status: components["schemas"]["status"];
+            tags: components["schemas"]["tags"];
         };
         exist_hoarder_book: {
-            hoarderId?: number;
+            hoarderId: number;
         } & components["schemas"]["hoarder_book"];
         post_hoarder_new: {
-            book?: components["schemas"]["book"];
-            status?: components["schemas"]["status"];
-            tags?: components["schemas"]["tags"];
+            book: components["schemas"]["book"];
+            status: components["schemas"]["status"];
+            tags: components["schemas"]["tags"];
         };
         post_hoarder_exist: {
-            status?: components["schemas"]["status"];
-            tags?: components["schemas"]["tags"];
+            status: components["schemas"]["status"];
+            tags: components["schemas"]["tags"];
         };
         patch_hoarder: {
             status?: components["schemas"]["status"];
             tags?: components["schemas"]["tags"];
         };
         tag_info: {
-            name?: string;
+            name: string;
         };
         exist_tag: components["schemas"]["tag_info"] & {
-            tagId?: number;
-            userId?: number;
+            tagId: number;
+            userId: number;
         };
     };
     responses: {
