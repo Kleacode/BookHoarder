@@ -18,7 +18,7 @@ type ServiceInterface interface {
 	DeleteUserIdHoarderHoarderId(c *gin.Context, userId int, hoarderId int) error
 	DeleteUserIdTagsTagId(c *gin.Context, userId int, tagId int) error
 
-	PatchUserIdBooksBookId(c *gin.Context, userId int, bookId int, data *api.PostBook) (api.ExistBook, error)
+	PatchUserIdBooksBookId(c *gin.Context, userId int, bookId int, data *api.PatchBook) (api.ExistBook, error)
 	PatchUserIdHoarderHoarderId(c *gin.Context, userId int, hoarderId int, data *api.PostHoarderExist) (api.ExistHoarderBook, error)
 
 	PostUserIdHoarder(c *gin.Context, userId int, data *api.PostHoarderNew) (api.ExistHoarderBook, error)
@@ -102,7 +102,7 @@ func (h *Handler) GetUserIdHoarder(c *gin.Context, userId int, params api.GetUse
 
 // PatchUserIdBooksBookId implements api.ServerInterface.
 func (h *Handler) PatchUserIdBooksBookId(c *gin.Context, userId int, bookId int) {
-	var data api.PostBook
+	var data api.PatchBook
 	if err := c.ShouldBindJSON(&data); err != nil {
 		c.JSON(domain.GetErrorResponse(err))
 		return

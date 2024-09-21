@@ -58,18 +58,18 @@ func (r *ExistHoarderRecord) ToExistHoarderBook() (api.ExistHoarderBook, error) 
 			if err != nil {
 				return api.ExistHoarderBook{}, ErrInternal
 			}
-			tags = append(tags, api.Tag{Id: &num_id, Name: &names[i]})
+			tags = append(tags, api.Tag{Id: num_id, Name: names[i]})
 		}
 	}
 
 	return api.ExistHoarderBook{
-		Book: &api.ExistBook{
-			Title:  &r.Title,
+		Book: api.ExistBook{
+			Title:  r.Title,
 			UserId: &r.BookUserID,
 			BookId: &r.BookID,
 		},
 		HoarderId: &r.HoarderID,
-		Status:    &s,
-		Tags:      &tags,
+		Status:    s,
+		Tags:      tags,
 	}, nil
 }

@@ -55,7 +55,7 @@ func (s *Service) GetBook(c *gin.Context, bookID int) (api.ExistBook, error) {
 	if err != nil {
 		return api.ExistBook{}, err
 	}
-	return api.ExistBook{BookId: &book.ID, Title: &book.Title.String, UserId: &book.UserID}, nil
+	return api.ExistBook{BookId: &book.ID, Title: book.Title.String, UserId: &book.UserID}, nil
 }
 
 // GetBooks implements handler.ServiceInterface.
@@ -66,7 +66,7 @@ func (s *Service) GetBooks(c *gin.Context, params *api.GetBooksParams) ([]api.Ex
 	}
 	var result []api.ExistBook
 	for _, b := range books {
-		result = append(result, api.ExistBook{BookId: &b.ID, Title: &b.Title.String, UserId: &b.UserID})
+		result = append(result, api.ExistBook{BookId: &b.ID, Title: b.Title.String, UserId: &b.UserID})
 	}
 	return result, nil
 }
@@ -96,7 +96,7 @@ func (s *Service) GetUserTags(c *gin.Context, userID int, params *api.GetUserIdT
 
 	var result []api.ExistTag
 	for _, t := range tags {
-		result = append(result, api.ExistTag{TagId: &t.ID, Name: &t.Name.String, UserId: &t.UserID})
+		result = append(result, api.ExistTag{TagId: &t.ID, Name: t.Name.String, UserId: &t.UserID})
 	}
 	return result, nil
 }
@@ -105,7 +105,7 @@ func (s *Service) GetUserTags(c *gin.Context, userID int, params *api.GetUserIdT
 func (s *Service) PatchUserIdBooksBookId(c *gin.Context, userId int, bookId int, data *api.Book) (api.ExistBook, error) {
 	_, err := s.repo.UpdateBook(c, &models.Book{
 		ID:        bookId,
-		Title:     null.NewString(*data.Title, true),
+		Title:     null.NewString(data.Title, true),
 		UserID:    userId,
 		UpdatedAt: time.Now(),
 	})
@@ -122,7 +122,7 @@ func (s *Service) PatchUserIdHoarderHoarderId(c *gin.Context, userId int, hoarde
 
 // PostUserIdHoarder implements handler.ServiceInterface.
 func (s *Service) PostUserIdHoarder(c *gin.Context, userId int, data *api.PostHoarderNew) (api.ExistHoarderBook, error) {
-	var newbook models.Book = models.Book{Title: null.NewString(*data.Book.Title, true), UserID: userId, CreatedAt: time.Now(), UpdatedAt: time.Now()}
+	var newbook models.Book = models.Book{Title: null.NewString(data.Book.Title, true), UserID: userId, CreatedAt: time.Now(), UpdatedAt: time.Now()}
 	b, err := s.repo.InsertBook(c, &newbook)
 	if err != nil {
 		return api.ExistHoarderBook{}, err
@@ -149,7 +149,7 @@ func (s *Service) PostUserIdHoarderBookId(c *gin.Context, userId int, bookId int
 
 	var tagids []int
 	for _, t := range *data.Tags {
-		tagids = append(tagids, *t.Id)
+		tagids = append(tagids, t.Id)
 	}
 	err = s.repo.UpsertHoarderTags(c, tagids, result.ID)
 	if err != nil {
@@ -161,12 +161,12 @@ func (s *Service) PostUserIdHoarderBookId(c *gin.Context, userId int, bookId int
 
 // PostUserIdTags implements handler.ServiceInterface.
 func (s *Service) PostUserIdTags(c *gin.Context, userId int, data *api.TagInfo) (api.ExistTag, error) {
-	tag, err := s.repo.InsertTag(c, &models.Tag{Name: null.NewString(*data.Name, true), UserID: userId, CreatedAt: time.Now(), UpdatedAt: time.Now()})
+	tag, err := s.repo.InsertTag(c, &models.Tag{Name: null.NewString(data.Name, true), UserID: userId, CreatedAt: time.Now(), UpdatedAt: time.Now()})
 	if err != nil {
 		return api.ExistTag{}, err
 	}
 
-	return api.ExistTag{TagId: &tag.ID, Name: &tag.Name.String, UserId: &tag.UserID}, nil
+	return api.ExistTag{TagId: &tag.ID, Name: tag.Name.String, UserId: &tag.UserID}, nil
 }
 
 func NewService(repo RepositoryInterface) handler.ServiceInterface {
