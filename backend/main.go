@@ -24,7 +24,7 @@ type User struct {
 func main() {
 	password := os.Getenv("POSTGRES_PASSWORD")
 	username := os.Getenv("POSTGRES_USER")
-	dbname := os.Getenv("POSTGRES_DB")
+	dbname := os.Getenv("POSTGRES_DEV_DB")
 	hostname := os.Getenv("HOST_NAME")
 
 	dataSource := fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", hostname, username, password, dbname)
@@ -36,7 +36,7 @@ func main() {
 
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:8001"},
+		AllowOrigins:     []string{"http://localhost:8001","http://localhost:3000"},
 		AllowMethods:     []string{"GET", "DELETE", "PUT", "PATCH", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},

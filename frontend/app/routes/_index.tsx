@@ -12,11 +12,12 @@ export default function Index() {
 	return (
 		<div className="font-sans p-4">
 			<Header
-				active="register"
+				active="booklist"
 				links={[
-					{ id: "register", path: "", name: "本の登録" },
-					{ id: "check", path: "", name: "積読確認" },
-					{ id: "settings", path: "", name: "全体設定" },
+					{ id: "booklist", path: "1/booklist", name: "本の一覧" },
+					{ id: "hoarder", path: "1/hoarder", name: "積読リスト" },
+					{ id: "taglist", path: "1/taglist", name: "タグ一覧" },
+					{ id: "register", path: "1/form", name: "本の登録" },
 				]}
 			/>
 		</div>

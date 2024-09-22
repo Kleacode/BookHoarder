@@ -1,6 +1,6 @@
 import { clsx } from "clsx";
 
-type LinkType = "register" | "check" | "settings" | "others";
+type LinkType = "booklist" | "hoarder" | "taglist" | "register";
 
 type Link = {
 	id: LinkType;

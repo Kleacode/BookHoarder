@@ -10,21 +10,16 @@ export interface SuggestItem extends TagFormItemProps {
 }
 
 export interface TagFormProps {
-	SearchSuggest: (searchWord: string) => SuggestItem[];
+	SetSearchTerm: (event: React.ChangeEvent<HTMLInputElement>) => void;
+	SuggestItems: SuggestItem[];
 }
 
-export const TagForm = ({ SearchSuggest }: TagFormProps) => {
+export const TagForm = ({ SetSearchTerm, SuggestItems }: TagFormProps) => {
 	const [tags, setTags] = useState<Tag[]>([]);
-	const [suggestItems, setSuggestItems] = useState<SuggestItem[]>([]);
 	const [searchWord, setSearchWord] = useState<string>("");
 	const [isShowDropDown, SetIsShowDropDown] = useState<boolean>(false);
 
 	const newIdCounter = useRef<number>(-1);
-
-	const onChangeSearchWord = (word: string) => {
-		setSearchWord(word);
-		setSuggestItems(SearchSuggest(word));
-	};
 
 	const CreateNewTag = (name: string) => {
 		setTags([...tags, Tag.fromJson({ id: newIdCounter.current, name })]);
@@ -49,7 +44,7 @@ export const TagForm = ({ SearchSuggest }: TagFormProps) => {
 	};
 
 	const OnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		onChangeSearchWord(event.target.value);
+		SetSearchTerm(event);
 	};
 
 	return (
@@ -66,7 +61,7 @@ export const TagForm = ({ SearchSuggest }: TagFormProps) => {
 				isDisplay={isShowDropDown}
 				searchWords={searchWord}
 				createNewTag={CreateNewTag}
-				suggests={suggestItems}
+				suggests={SuggestItems}
 			/>
 
 			<div>

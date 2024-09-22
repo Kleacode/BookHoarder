@@ -1,0 +1,10 @@
+delete:
+  summary: タグを削除する
+  parameters:
+    - $ref: "../components/parameters/userId.yaml"
+    - $ref: "../components/parameters/tagId.yaml"
+  responses:
+    "204":
+      description: 削除成功
+    default:
+      $ref: "../components/responses/default_response.yaml"

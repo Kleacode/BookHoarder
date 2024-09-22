@@ -8,7 +8,7 @@ import _ from "lodash";
 import type * as SchemaHelper from "@/libs/schemas/schemaHealper";
 import { interceptCsrf } from "./interceptors/csrfInterceptor";
 
-const API_URL = "";
+const API_URL = "http://localhost:8080";
 
 /// Axiosのインストラクタ用意
 

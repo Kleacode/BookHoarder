@@ -1,14 +1,3 @@
-book_info:
-  type: object
-  properties:
-    title:
-      type: string
-    tagIds:
-      type: array
-      items: 
-        type: integer
-        format: int64
-
 components:
   schemas:
     status:
@@ -18,36 +7,114 @@ components:
         - "wip"
         - "done"
 
+    tag:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    tags:
+      type: array
+      items:
+        $ref: "#/components/schemas/tag"
+
+    book:
+      type: object
+      required:
+        - title
+      properties:
+        title:
+          type: string
+
 new_book:
+  required:
+    - book
+    - userId
   allOf:
-    - $ref: "#/book_info"
+    - $ref: "#/components/schemas/book"
     - properties:
         userId:
           type: integer
-          format: int64
 
 exist_book:
+  required:
+    - new_book
+    - bookId
   allOf:
     - $ref: "#/new_book"
     - properties:
         bookId:
           type: integer
-          format: int64
 
 hoarder_book:
+  type: object
+  required:
+    - book
+    - status
+    - tags
+  properties:
+    book:
+      $ref: "#/exist_book"
+    status:
+      $ref: "#/components/schemas/status"
+    tags:
+      $ref: "#/components/schemas/tags"
+
+exist_hoarder_book:
+  required:
+    - hoarderId
+    - hoarder_book
   allOf:
-    - $ref: "#/exist_book"
     - properties:
-        status:
-          $ref: "#/components/schemas/status"
+        hoarderId:
+          type: integer
+    - $ref: "#/hoarder_book"
 
 post_book:
+  required:
+    - book
   allOf:
-    - $ref: "#/book_info"
+    - $ref: "#/components/schemas/book"
 
-post_hoarder:
+post_hoarder_new:
+  required:
+    - book
+    - status
+    - tags
   allOf:
-    - $ref: "#/book_info"
+    - properties:
+        book:
+          $ref: "#/components/schemas/book"
+        status:
+          $ref: "#/components/schemas/status"
+        tags:
+          $ref: "#/components/schemas/tags"
+
+post_hoarder_exist:
+  required:
+    - status
+    - tags
+  allOf:
     - properties:
         status:
           $ref: "#/components/schemas/status"
+        tags:
+          $ref: "#/components/schemas/tags"
+
+
+patch_hoarder:
+  allOf:
+    - properties:
+        status:
+          $ref: "#/components/schemas/status"
+        tags:
+          $ref: "#/components/schemas/tags"
+
+patch_book:
+  allOf:
+    - $ref: "#/components/schemas/book"

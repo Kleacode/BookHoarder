@@ -50,7 +50,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/post_book'
+              $ref: '#/components/schemas/patch_book'
       responses:
         '200':
           description: 更新成功
@@ -72,7 +72,7 @@ paths:
           $ref: '#/components/responses/default_response'
   /{userId}/hoarder:
     get:
-      summary: ユーザーの積読リストから、本の一覧を取得する。
+      summary: ユーザーの積読リストから、積読の一覧を取得する。
       parameters:
         - $ref: '#/components/parameters/userId'
         - name: status
@@ -95,30 +95,30 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/hoarder_book'
+                  $ref: '#/components/schemas/exist_hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
     post:
-      summary: 本を新しく登録する。そのままユーザーの積読リストにも登録する。
+      summary: 本を新しく登録する。その本をユーザーの積読リストに積読として登録する。
       parameters:
         - $ref: '#/components/parameters/userId'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/post_hoarder'
+              $ref: '#/components/schemas/post_hoarder_new'
       responses:
         '201':
           description: 登録成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/hoarder_book'
+                $ref: '#/components/schemas/exist_hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
   /{userId}/hoarder/{bookId}:
     post:
-      summary: ユーザーの積読リストに本を登録する
+      summary: ユーザーの積読リストに既に登録済みの本から積読を登録する
       parameters:
         - $ref: '#/components/parameters/userId'
         - $ref: '#/components/parameters/bookId'
@@ -126,40 +126,90 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/post_hoarder'
+              $ref: '#/components/schemas/post_hoarder_exist'
       responses:
         '201':
           description: 登録成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/hoarder_book'
+                $ref: '#/components/schemas/exist_hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
+  /{userId}/hoarder/{hoarderId}:
     patch:
-      summary: ユーザーの積読リストにある本の状態を更新する
+      summary: ユーザーの積読リストにある積読の状態を更新する
       parameters:
         - $ref: '#/components/parameters/userId'
-        - $ref: '#/components/parameters/bookId'
+        - $ref: '#/components/parameters/hoarderId'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/post_hoarder'
+              $ref: '#/components/schemas/patch_hoarder'
       responses:
         '200':
           description: 更新成功
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/hoarder_book'
+                $ref: '#/components/schemas/exist_hoarder_book'
         default:
           $ref: '#/components/responses/default_response'
     delete:
-      summary: ユーザーの積読リストにある本を削除する
+      summary: ユーザーの積読リストにある積読を削除する
       parameters:
         - $ref: '#/components/parameters/userId'
-        - $ref: '#/components/parameters/bookId'
+        - $ref: '#/components/parameters/hoarderId'
+      responses:
+        '204':
+          description: 削除成功
+        default:
+          $ref: '#/components/responses/default_response'
+  /{userId}/tags:
+    get:
+      summary: ユーザーが登録したタグを取得する
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - name: name
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/exist_tag'
+        default:
+          $ref: '#/components/responses/default_response'
+    post:
+      summary: タグを新しく登録する
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/tag_info'
+      responses:
+        '201':
+          description: 登録成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/exist_tag'
+        default:
+          $ref: '#/components/responses/default_response'
+  /{userId}/tags/{tagId}:
+    delete:
+      summary: タグを削除する
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/tagId'
       responses:
         '204':
           description: 削除成功
@@ -178,51 +228,125 @@ components:
           format: int32
         message:
           type: string
-    book_info:
+    book:
       type: object
+      required:
+        - title
       properties:
         title:
           type: string
-        tagIds:
-          type: array
-          items:
-            type: integer
-            format: int64
     new_book:
+      required:
+        - book
+        - userId
       allOf:
-        - $ref: '#/components/schemas/book_info'
+        - $ref: '#/components/schemas/book'
         - properties:
             userId:
               type: integer
-              format: int64
     exist_book:
+      required:
+        - new_book
+        - bookId
       allOf:
         - $ref: '#/components/schemas/new_book'
         - properties:
             bookId:
               type: integer
-              format: int64
-    post_book:
+    patch_book:
       allOf:
-        - $ref: '#/components/schemas/book_info'
+        - $ref: '#/components/schemas/book'
     status:
       type: string
       enum:
         - todo
         - wip
         - done
+    tag:
+      type: object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+    tags:
+      type: array
+      items:
+        $ref: '#/components/schemas/tag'
     hoarder_book:
+      type: object
+      required:
+        - book
+        - status
+        - tags
+      properties:
+        book:
+          $ref: '#/components/schemas/exist_book'
+        status:
+          $ref: '#/components/schemas/status'
+        tags:
+          $ref: '#/components/schemas/tags'
+    exist_hoarder_book:
+      required:
+        - hoarderId
+        - hoarder_book
       allOf:
-        - $ref: '#/components/schemas/exist_book'
+        - properties:
+            hoarderId:
+              type: integer
+        - $ref: '#/components/schemas/hoarder_book'
+    post_hoarder_new:
+      required:
+        - book
+        - status
+        - tags
+      allOf:
+        - properties:
+            book:
+              $ref: '#/components/schemas/book'
+            status:
+              $ref: '#/components/schemas/status'
+            tags:
+              $ref: '#/components/schemas/tags'
+    post_hoarder_exist:
+      required:
+        - status
+        - tags
+      allOf:
         - properties:
             status:
               $ref: '#/components/schemas/status'
-    post_hoarder:
+            tags:
+              $ref: '#/components/schemas/tags'
+    patch_hoarder:
       allOf:
-        - $ref: '#/components/schemas/book_info'
         - properties:
             status:
               $ref: '#/components/schemas/status'
+            tags:
+              $ref: '#/components/schemas/tags'
+    tag_info:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+    exist_tag:
+      required:
+        - tag_info
+        - tagId
+        - userId
+      allOf:
+        - $ref: '#/components/schemas/tag_info'
+        - properties:
+            tagId:
+              type: integer
+            userId:
+              type: integer
   responses:
     default_response:
       description: unexpected error
@@ -239,6 +363,18 @@ components:
         type: integer
     userId:
       name: userId
+      in: path
+      required: true
+      schema:
+        type: integer
+    hoarderId:
+      name: hoarderId
+      in: path
+      required: true
+      schema:
+        type: integer
+    tagId:
+      name: tagId
       in: path
       required: true
       schema:

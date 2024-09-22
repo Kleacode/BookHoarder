@@ -1,0 +1,20 @@
+tag_info:
+  type: object
+  required:
+    - name
+  properties:
+    name:
+      type: string
+
+exist_tag:
+  required:
+    - tag_info
+    - tagId
+    - userId
+  allOf:
+    - $ref: "#/tag_info"
+    - properties:
+        tagId:
+          type: integer
+        userId:
+          type: integer
