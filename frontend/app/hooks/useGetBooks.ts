@@ -16,6 +16,8 @@ export const useGetBooks = (
 			setBooks(data.response?.data ?? []);
 		} catch (e) {}
 	};
+
+	// biome-ignore lint/correctness/useExhaustiveDependencies: TODO
 	useEffect(() => {
 		getBooks();
 	}, []);

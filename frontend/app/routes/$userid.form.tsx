@@ -2,19 +2,29 @@ import { Button, Header } from "@/components";
 import { DropDownForm } from "@/components/form/DropDownForm";
 import { InputTextForm } from "@/components/form/InputTextForm";
 import { type SuggestItem, TagForm } from "@/components/form/tagform/TagForm";
-import { postHoarder } from "@/hooks/postHoarder";
-import { useGetTags } from "@/hooks/useGetTags";
+import { useGetSuggestTags } from "@/hooks/useGetSuggestTags";
 import type { StatusType } from "@/libs/schemas/schemaHealper";
 import { ConvertStatusTypeToLabel } from "@/utils/ConvertStatusType";
+import { postHoarder } from "@/utils/api/postHoarder";
 import { useParams } from "@remix-run/react";
 import { useState } from "react";
 
 export default function Index() {
 	const [title, setTitle] = useState<string>("");
-	const [suggests, setSuggests] = useState<SuggestItem[]>([]);
+	const [searchTerm, setSearchTerm] = useState<string>("");
 	const params = useParams();
 	const userID = Number.parseInt(params.userid ?? "-1", 10);
 
+	// TODO tagform refactor
+	const tags = useGetSuggestTags(
+		{ userId: userID },
+		{ params: { name: searchTerm } },
+		searchTerm,
+	);
+	const suggestItems: SuggestItem[] = tags?.map((e) => ({
+		key: e.tagId,
+		label: e.name,
+	}));
 	const postNewHoarder = () => {
 		postHoarder(
 			{ userId: userID },
@@ -24,14 +34,6 @@ export default function Index() {
 				status: "wip",
 			},
 		);
-	};
-
-	// TODO nestしたHook呼び出しは不可能
-	const searchSuggest = (w: string) => {
-		const tags = useGetTags({ userId: userID }, { params: { name: w } });
-		const result: SuggestItem[] =
-			tags?.map((e) => ({ key: e.tagId, label: e.name }));
-		setSuggests(result);
 	};
 
 	const statusTypes: StatusType[] = ["todo", "wip", "done"];
@@ -57,12 +59,16 @@ export default function Index() {
 				/>
 				<DropDownForm<string> label="状態" options={statusOptions} />
 				<TagForm
-					SearchSuggest={(w) => {
-						searchSuggest(w);
-						return suggests;
+					SetSearchTerm={(e) => {
+						setSearchTerm(e.target.value);
 					}}
+					SuggestItems={suggestItems}
 				/>
 				<Button label="Submit" onClick={postNewHoarder} />
+
+				<div>isbnから自動入力する</div>
+				<InputTextForm label="isbnコード" />
+				<Button label="コードから自動入力" />
 			</div>
 		</div>
 	);

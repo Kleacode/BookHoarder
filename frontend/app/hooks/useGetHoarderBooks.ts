@@ -20,6 +20,7 @@ export const useGetHoarderBooks = (
 		} catch (e) {}
 	};
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: TODO
 	useEffect(() => {
 		getHoarderBooks();
 	}, []);

@@ -2,12 +2,14 @@ import { Header } from "@/components";
 import { Button } from "@/components/button/Button";
 import { InputTextForm } from "@/components/form/InputTextForm";
 import { Tag, type TagProps } from "@/components/tag/Tag";
-import { deleteTag } from "@/hooks/deleteTag";
-import { postTag } from "@/hooks/postTag";
 import { responseGetTags, useGetTags } from "@/hooks/useGetTags";
 import type { StatusType } from "@/libs/schemas/schemaHealper";
+import { deleteTag } from "@/utils/api/deleteTag";
+import { postTag } from "@/utils/api/postTag";
 import { useParams } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import _ from "lodash";
 
 export interface TableElement {
 	title: string;
@@ -20,15 +22,18 @@ export default function Index() {
 	const userID = Number.parseInt(params.userid ?? "-1", 10);
 
 	const [tagname, setTagName] = useState<string>("");
-	// TODO post, delete等がある場合、fetchはどうやる？
-	const tags = useGetTags({ userId: userID }, {});
 
-	const onClickTag = (tagId: number) => {
-		deleteTag({ userId: userID, tagId: tagId }, {});
+	const ref = useRef();
+	const tags = useGetTags({ userId: userID }, {}, ref);
+
+	const onClickTag = (tagId: number) => async () => {
+		await deleteTag({ userId: userID, tagId: tagId }, {});
+		_.invoke(ref, "current");
 	};
 
-	const onPostTag = () => {
-		postTag({ userId: userID }, { name: tagname });
+	const onPostTag = async () => {
+		await postTag({ userId: userID }, { name: tagname });
+		_.invoke(ref, "current");
 	};
 
 	return (
@@ -52,11 +57,10 @@ export default function Index() {
 			<div>
 				{tags?.map((e) => {
 					return (
-						// TODO onClickアンチパターン？
 						<Tag
 							key={e.tagId}
 							label={e.name ?? ""}
-							onClick={() => onClickTag(e.tagId)}
+							onClick={onClickTag(e.tagId)}
 						/>
 					);
 				})}

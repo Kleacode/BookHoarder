@@ -7,11 +7,10 @@ import { useEffect, useState } from "react";
 
 export type responseGetTags = ResponseData<"/{userId}/tags", "get">;
 
-export const useGetTags = (
+export const useGetSuggestTags = (
 	pathParam: PathParameters<"/{userId}/tags", "get">,
 	reqParam: AxiosAliasWrapper<"/{userId}/tags", "get">,
-	// biome-ignore lint: TODO 型情報直す
-	ref: any,
+	searchTerm: string,
 ) => {
 	const [tags, setTags] = useState<responseGetTags>([]);
 
@@ -22,12 +21,10 @@ export const useGetTags = (
 		} catch (e) {}
 	};
 
-	ref.current = getTags;
-
-	// biome-ignore lint/correctness/useExhaustiveDependencies(getTags): TODO
+	// biome-ignore lint/correctness/useExhaustiveDependencies: TODO
 	useEffect(() => {
 		getTags();
-	}, []);
+	}, [searchTerm]);
 
 	return tags;
 };

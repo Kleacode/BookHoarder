@@ -11,10 +11,11 @@ import { useGetHoarderBooks } from "@/hooks/useGetHoarderBooks";
 import { useParams } from "@remix-run/react";
 
 export default function Index() {
-	// TODO useParamsもHook化すべきかどうか？
+	// TODO useParams Hook化
 	const params = useParams();
 	const userID = Number.parseInt(params.userid ?? "-1", 10);
 	const hoarderBooks = useGetHoarderBooks({ userId: userID }, {});
+	// TODO header 共通化
 	return (
 		<div className="font-sans p-4">
 			<Header
