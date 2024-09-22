@@ -7,7 +7,7 @@ RUN npm i -g pnpm
 
 RUN set -ex \
     && apt update \
-    && apt upgrade \
+    && apt upgrade -y \
     && apt install -y \
     xdg-utils
 
